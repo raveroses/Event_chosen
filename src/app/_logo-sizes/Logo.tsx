@@ -14,7 +14,7 @@ const MobileLogo = (): JSX.Element => {
     <Image
       src={imageSizes.mobileImage!}
       alt="mobile-logo"
-      width={100}
+      width={60}
       height={50}
     />
   );

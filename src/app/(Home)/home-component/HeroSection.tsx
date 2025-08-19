@@ -20,16 +20,21 @@ import { FaMasksTheater } from "react-icons/fa6";
 import { TbBeach } from "react-icons/tb";
 import { BsChatLeftHeartFill } from "react-icons/bs";
 import { PiGameControllerBold } from "react-icons/pi";
-type HeroSection = string[];
+type HeroSection = {
+  mobile: string;
+  desktop: string;
+};
+
 type Activities = {
   activity: string;
   icon: JSX.Element;
 };
+
 const HeroSection = (): JSX.Element => {
-  const [heroSection] = useState<HeroSection>([
-    "/images/hero.webp",
-    "/images/hero2.webp",
-    "/images/hero3.webp",
+  const [heroSection] = useState<HeroSection[]>([
+    { mobile: "/images/hero-mobile.webp", desktop: "/images/hero.webp" },
+    { mobile: "/images/hero2-mobile.webp", desktop: "/images/hero2.webp" },
+    { mobile: "/images/hero3-mobile.webp", desktop: "/images/hero3.webp" },
   ]);
 
   const [activities] = useState<Activities[]>([
@@ -51,10 +56,11 @@ const HeroSection = (): JSX.Element => {
 
   const prevRef = useRef<HTMLButtonElement | null>(null);
   const nextRef = useRef<HTMLButtonElement | null>(null);
+
   const heroMapping = heroSection.map((heroImage, index) => {
     return (
       <SwiperSlide key={index}>
-        <div className="relative w-full h-[400px]">
+        <div className="relative w-full min-w-full h-[400px]">
           <button
             className="custom-prev absolute top-1/2 left-4 -translate-y-1/2 z-10"
             ref={prevRef}
@@ -69,10 +75,16 @@ const HeroSection = (): JSX.Element => {
           </button>
 
           <Image
-            src={heroImage}
+            src={heroImage.desktop}
             alt={`hero-section-${index + 1}`}
             fill
-            className="object-center object-cover rounded-t-2xl rounded-b-xl"
+            className="object-center object-cover  rounded-t-2xl rounded-b-xl md:block"
+          />
+          <Image
+            src={heroImage.mobile}
+            alt={`hero-section-${index + 1}`}
+            fill
+            className="object-center object-cover  md:hidden block"
           />
         </div>
       </SwiperSlide>
@@ -80,7 +92,7 @@ const HeroSection = (): JSX.Element => {
   });
 
   return (
-    <div className="w-full min-w-full my-4">
+    <div className="w-full min-w-full my-4  ">
       <Swiper
         modules={[Navigation, Pagination, Scrollbar, Autoplay]}
         spaceBetween={0}
@@ -107,7 +119,7 @@ const HeroSection = (): JSX.Element => {
         {heroMapping}
       </Swiper>
 
-      <section className="w-full min-w-full flex items-center justify-between px-2 my-10">
+      <section className="w-full min-w-full flex items-center md:justify-between gap-[50px] px-2 my-10 md:overflow-hidden overflow-x-scroll">
         {activities.map((activitis, index) => {
           return (
             <div key={index} className="group cursor-pointer w-[110px]">
