@@ -6,7 +6,7 @@ import { MdOutlineNotifications } from "react-icons/md";
 import { PiCaretDownBold } from "react-icons/pi";
 const ManagmentHeader = () => {
   return (
-    <header className="flex justify-between items-center p-4">
+    <header className="flex justify-between items-center border-b border-gray-200 pb-[8px]">
       <div className="md:hidden">
         <MobileLogo />
       </div>
