@@ -38,10 +38,6 @@ const Sidebar = () => {
           </div>
         );
       })}
-
-      <div className="steps">
-        <p>Steps</p>
-      </div>
     </section>
   );
 };
