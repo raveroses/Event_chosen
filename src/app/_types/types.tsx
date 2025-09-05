@@ -24,6 +24,8 @@ export type Context = {
   eventData: Event[];
   eventFilter: Event[];
   eventInputSearch: Event[];
+  handleAllClick: (eventDay: string) => void;
+  eventDays: string;
 };
 
 export type InputCard = {

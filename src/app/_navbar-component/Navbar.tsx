@@ -79,8 +79,8 @@ const Navbar = () => {
   });
 
   return (
-    <section className=" relative border-b border-gray-200 p-4  ">
-      <div className="flex items-center justify-between">
+    <section className="relative">
+      <div className="fixed top-0 flex items-center justify-between z-30 border-b border-gray-200 w-full p-4 bg-white ">
         <div className="md:hidden">
           <MobileLogo />
         </div>

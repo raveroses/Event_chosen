@@ -9,28 +9,6 @@ import { Event, Search } from "../_types/types";
 import createcontext from "./CreateContext";
 const ContextProvider = ({ children }: { children: ReactNode }) => {
   const [eventData, setEventData] = useState<Event[]>([]);
-
-  useEffect(() => {
-    const fetchingEvent = async () => {
-      try {
-        const { data, error } = await supabase.from("evemtchoosen").select();
-        console.log("Data=>", data, "Error", error);
-        if (data !== null) {
-          setEventData(data);
-        }
-      } catch (e: unknown) {
-        if (e instanceof Error) {
-          console.log(e.message);
-        }
-      }
-    };
-
-    fetchingEvent();
-  }, []);
-
-  //   console.log(eventData);
-
-  //   Navbar
   const [searchFocus, setSearchFocus] = useState<Search>({
     searchValue: "",
     locationSearch: "",
@@ -38,8 +16,41 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     searchHistory: [],
     isEventFocus: false,
   });
+  const [eventLocation, setEventLocation] = useState<string>("");
+
   const [eventFilter, setEventFilter] = useState<Event[]>([]);
   const [eventInputSearch, setEventInputSearch] = useState<Event[]>([]);
+  // const [isClick,setIsClick]= useState<boolean>(false)
+  const fetchingEvent = async () => {
+    try {
+      const { data, error } = await supabase.from("evemtchoosen").select();
+      console.log("Data=>", data, "Error", error);
+      if (data !== null) {
+        setEventData(data);
+      }
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        console.log(e.message);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchingEvent();
+  }, []);
+  const [eventDays, setEventDays] = useState<string>("");
+  const handleAllClick = (eventDay: string) => {
+    if (eventDay === "All") {
+      setEventFilter(eventData);
+    } else {
+      setEventFilter([]);
+    }
+
+    setEventDays(eventDay);
+  };
+  //   console.log(eventData);
+
+  //   Navbar
 
   const handleSeachFocus = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -52,13 +63,10 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     }
 
     setSearchFocus((prev) => {
-      const duplicate = [...prev.searchHistory, prev.searchValue.trim()];
-
       const updatedHistory = Array.from(
         new Set([...prev.searchHistory, prev.searchValue.trim()])
       );
 
-      console.log("Duplicate", duplicate);
       const add = {
         ...prev,
         searchHistory: updatedHistory,
@@ -80,16 +88,10 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // useEffect(() => {
-  //   handleSearchEventEnter();
-  // }, []);
-
   const handleClear = () => {
     setSearchFocus((prev) => ({ ...prev, searchHistory: [], searchValue: "" }));
   };
-  // console.log(searchFocus.searchHistory.length);
 
-  const [eventLocation, setEventLocation] = useState<string>("");
   const handleEventLocation = (location: string) => {
     setEventLocation(location);
   };
@@ -136,7 +138,6 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
       setEventFilter(filtered);
     }
   }, [eventLocation, eventData, searchFocus.searchValue, eventInputSearch]);
-  console.log(eventFilter);
 
   return (
     <createcontext.Provider
@@ -154,6 +155,8 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
         handleEventFocus,
         eventFilter,
         eventInputSearch,
+        handleAllClick,
+        eventDays,
       }}
     >
       {children}

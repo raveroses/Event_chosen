@@ -32,7 +32,7 @@ const DashboardFirstBody = () => {
         <p>Back to events</p>
       </Link>
 
-      <div className="relative bg-white rounded-xl shadow w-[275px] h-[240px] my-[35px]">
+      <div className="relative bg-white rounded-xl shadow w-[275px] h-[240px] my-[35px] ">
         <Image
           src={"/images/auto-create-floating-card-splatter1.png"}
           alt="image part"

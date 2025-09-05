@@ -92,7 +92,7 @@ const HeroSection = (): JSX.Element => {
   });
 
   return (
-    <div className="w-full min-w-full my-4  ">
+    <div className="w-full min-w-full md:my-[120px] my-4  ">
       <Swiper
         modules={[Navigation, Pagination, Scrollbar, Autoplay]}
         spaceBetween={0}
@@ -119,11 +119,11 @@ const HeroSection = (): JSX.Element => {
         {heroMapping}
       </Swiper>
 
-      <section className="w-full min-w-full flex items-center md:justify-between gap-[50px] px-2 my-10 md:overflow-hidden overflow-x-scroll">
+      <section className="w-full min-w-full flex items-center md:justify-between gap-[50px] md:px-2 my-10 md:overflow-hidden overflow-x-scroll">
         {activities.map((activitis, index) => {
           return (
             <div key={index} className="group cursor-pointer w-[110px]">
-              <div className="group-hover:bg-blue-100    border border-gray-200 rounded-full w-[100px] h-[100px] flex justify-center items-center text-[35px] text-gray-500 ">
+              <div className="group-hover:bg-blue-100   border border-gray-200 rounded-full w-[100px] h-[100px] flex justify-center items-center text-[35px] text-gray-500 ">
                 {activitis.icon}
               </div>
 

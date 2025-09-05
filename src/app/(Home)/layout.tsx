@@ -8,7 +8,7 @@ export default function DashboardLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <div className="z-10 px-4">{children}</div>
+      <div className="z-10 md:px-4">{children}</div>
       <Footer />
     </div>
   );
