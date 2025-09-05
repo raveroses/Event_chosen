@@ -7,6 +7,8 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_API_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 import { Event, Search } from "../_types/types";
 import createcontext from "./CreateContext";
+import { EventDetail } from "../_types/types";
+import { toast } from "react-toastify";
 const ContextProvider = ({ children }: { children: ReactNode }) => {
   const [eventData, setEventData] = useState<Event[]>([]);
   const [searchFocus, setSearchFocus] = useState<Search>({
@@ -118,7 +120,8 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // LOCATION FILTERING
-
+  const [locationCreationChoosen, setLocationCreationChoosen] =
+    useState<string>("Venue");
   useEffect(() => {
     if (
       eventLocation.trim() === "" ||
@@ -139,6 +142,34 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [eventLocation, eventData, searchFocus.searchValue, eventInputSearch]);
 
+  const [eventDetailCreation, setEventDetailCreation] = useState<EventDetail>({
+    eventTitle: "",
+    eventSummary: "",
+    eventStatus: "",
+    eventLocationsCreate: locationCreationChoosen.trim(),
+    eventOverview: "",
+  });
+
+  const handleEventCreationOnchange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+
+    setEventDetailCreation((prev) => ({ ...prev, [name]: value.trim() }));
+  };
+
+  // const handleEventCreationValidation = () => {
+  //   if (!eventDetailCreation.eventTitle || !eventDetailCreation.eventSummary) {
+  //     toast.error("Please, Check all fields");
+  //     return;
+  //   }
+
+  // };
+
+  const handleEventLocationChoosen = (locationName: string) => {
+    setLocationCreationChoosen(locationName);
+  };
+
   return (
     <createcontext.Provider
       value={{
@@ -157,6 +188,10 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
         eventInputSearch,
         handleAllClick,
         eventDays,
+        eventDetailCreation,
+        handleEventCreationOnchange,
+        handleEventLocationChoosen,
+        locationCreationChoosen,
       }}
     >
       {children}

@@ -4,7 +4,7 @@ import { PiCaretDownBold, PiCaretLeftBold } from "react-icons/pi";
 import Image from "next/image";
 import { MdCalendarMonth } from "react-icons/md";
 import { useState } from "react";
-
+import useAppContext from "@/app/_custom-hooks/useAppContext";
 const DashboardFirstBody = () => {
   const [inputContent] = useState<{ heading: string; pcontent?: string }[]>([
     {
@@ -22,6 +22,8 @@ const DashboardFirstBody = () => {
       pcontent: "",
     },
   ]);
+  const { eventDetailCreation } = useAppContext();
+
   return (
     <section className="">
       <Link
@@ -49,7 +51,9 @@ const DashboardFirstBody = () => {
         />
 
         <div className="content flex flex-col gap-[15px] py-[50px] px-[15px]">
-          <h3 className="text-[20px] font-bold">Event Title</h3>
+          <h3 className="text-[20px] font-bold">
+            {eventDetailCreation.eventTitle || "Event Title"}
+          </h3>
 
           <div className="date text-gray-600 flex items-center gap-[10px]">
             <MdCalendarMonth className="text-[20px] " />

@@ -4,8 +4,10 @@ import { FaCalendar, FaPlus } from "react-icons/fa6";
 import { FiUpload } from "react-icons/fi";
 import { ImLocation } from "react-icons/im";
 import { MdOutlineLocationOn, MdOutlineOndemandVideo } from "react-icons/md";
-
+import useAppContext from "@/app/_custom-hooks/useAppContext";
 const EventTitle = () => {
+  const { handleEventCreationOnchange, eventDetailCreation } = useAppContext();
+  console.log(eventDetailCreation);
   return (
     <section className="w-full border-2 border-gray-200 hover:border-[#3659e3] md:p-[30px] p-[15px] md:rounded-xl transition-all duration-200 md:bg-transparent bg-white">
       <div className="flex items-start justify-between ">
@@ -29,7 +31,13 @@ const EventTitle = () => {
             event is about.
           </p>
 
-          <input type="text" className="border-2 w-full p-3 rounded" />
+          <input
+            type="text"
+            className="border-2 w-full p-3 rounded"
+            name="eventTitle"
+            value={eventDetailCreation.eventTitle}
+            onChange={handleEventCreationOnchange}
+          />
         </div>
 
         <div className="summary flex gap-[30px] flex-col ">
@@ -41,9 +49,10 @@ const EventTitle = () => {
           </p>
 
           <textarea
-            name=""
-            id=""
             className="border-2 w-full p-3 rounded"
+            name="eventSummary"
+            value={eventDetailCreation.eventSummary}
+            onChange={handleEventCreationOnchange}
           ></textarea>
         </div>
       </div>
@@ -52,22 +61,32 @@ const EventTitle = () => {
 };
 
 const Date = () => {
+  const {
+    handleEventCreationOnchange,
+    eventDetailCreation,
+    handleEventLocationChoosen,
+    locationCreationChoosen,
+  } = useAppContext();
+
   const [DateInput] = useState<
     {
       icon: ReactNode;
       heading: string;
       pcontent: string;
+      values: string;
     }[]
   >([
     {
       icon: <FaCalendar />,
       heading: "  Single Event",
       pcontent: " For events that happen once",
+      values: "single",
     },
     {
       icon: <FaCalendar />,
       heading: "Reccurring Event",
       pcontent: "For timed entry and multiple days ",
+      values: "reoccuring",
     },
   ]);
 
@@ -136,7 +155,13 @@ const Date = () => {
                     <p className="text-[14px] text-gray-600">{item.pcontent}</p>
                   </div>
                 </label>
-                <input type="radio" name="" id="" />
+                <input
+                  type="radio"
+                  name="eventStatus"
+                  value={item.values}
+                  onChange={handleEventCreationOnchange}
+                  checked={eventDetailCreation.eventStatus === item.values}
+                />
               </div>
             );
           })}
@@ -154,24 +179,25 @@ const Date = () => {
               key={index}
               className={`flex-shrink-0 flex items-center gap-[5px] px-3 py-2 rounded-md text-sm font-semibold cursor-pointer transition-colors duration-200
         ${
-          item.locationType === "Venue"
+          item.locationType === locationCreationChoosen
             ? "bg-[#3659e3] text-white hover:bg-blue-400"
             : "hover:bg-gray-300"
         }`}
+              onClick={() => handleEventLocationChoosen(item.locationType)}
             >
               <div className="text-[18px]">{item.icon}</div>
               <div>{item.locationType}</div>
             </div>
           ))}
         </div>
-
-        <input type="text" className="w-full border-2 p-2 rounded " />
       </div>
     </section>
   );
 };
 
 const Overview = () => {
+  const { handleEventCreationOnchange, eventDetailCreation } = useAppContext();
+
   return (
     <section className=" border-2 border-gray-200 hover:border-[#3659e3] md:p-[30px] p-[15px] md:rounded-xl transition-all duration-200 md:bg-transparent bg-white">
       <div className="flex items-start justify-between hidde">
@@ -196,9 +222,10 @@ const Overview = () => {
             </div>
             <div>
               <textarea
-                name=""
-                id=""
+                name="eventOverview"
+                value={eventDetailCreation.eventOverview}
                 className="border rounded w-full h-[100px] focus:outline-[#3659e3] resize-none"
+                onChange={handleEventCreationOnchange}
               ></textarea>
             </div>
           </div>
@@ -212,6 +239,8 @@ const Overview = () => {
   );
 };
 const ImageUploader = () => {
+  // const { handleEventCreationOnchange, eventDetailCreation } = useAppContext();
+
   return (
     <section className="md:w-[800px] w-full min-width-full md:overflow-y-scroll overflow-none flex flex-col gap-[10px] md:gap-[100px]  ">
       <div className="relative background w-full md:h-[400px] h-[300px] min-w-full md:rounded-2xl">

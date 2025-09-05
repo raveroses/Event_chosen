@@ -80,7 +80,7 @@ const Navbar = () => {
 
   return (
     <section className="relative">
-      <div className="fixed top-0 flex items-center justify-between z-30 border-b border-gray-200 w-full p-4 bg-white ">
+      <div className="fixed top-0 flex items-center justify-between z-30 border-b border-gray-200 w-full md:p-4 px-4 pt-4 pb-[45px] bg-white ">
         <div className="md:hidden">
           <MobileLogo />
         </div>
@@ -187,7 +187,7 @@ const Navbar = () => {
         <ul
           className="md:static absolute top-[75px] right-0 md:w-auto md:h-auto w-[200px] h-[320px] md:bg-transparent  
           bg-white md:shadow-none shadow-md z-10  flex md:flex-row flex-col gap-10 md:items-center items-left  
-          justify-left font-medium text-[14px] md:p-auto p-5"
+          justify-left font-medium text-[14px] md:p-auto p-5 "
         >
           <Link href={"/"}>
             <li className="">Find Events</li>
@@ -207,7 +207,7 @@ const Navbar = () => {
         </ul>
       </div>
 
-      <div className="mobile-search md:hidden">
+      <div className="mobile-search md:hidden w-full fixed top-[70px] z-40 ">
         <div className="event-search flex items-center justify-between border border-gray-200 rounded-3xl p-1">
           <div className="flex items-center gap-2 pl-3">
             <MdArrowBack className="text-[22px] font-bold hidden" />
@@ -216,6 +216,11 @@ const Navbar = () => {
               type="text"
               className="w-[80px] border-none outline-none placeholder:text-[12px] "
               placeholder="Search event"
+              onFocus={handleEventFocus}
+              onBlur={handleEventBlur}
+              onKeyDown={handleSearchEventEnter}
+              value={searchFocus.searchValue}
+              onChange={handleSeachFocus}
             />
           </div>
           <div className="bg-[#9f2c15] rounded-full p-2 ">

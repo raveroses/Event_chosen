@@ -26,6 +26,12 @@ export type Context = {
   eventInputSearch: Event[];
   handleAllClick: (eventDay: string) => void;
   eventDays: string;
+  handleEventCreationOnchange: (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+  eventDetailCreation: EventDetail;
+  handleEventLocationChoosen: (locationName: string) => void;
+  locationCreationChoosen: string;
 };
 
 export type InputCard = {
@@ -38,4 +44,12 @@ export type Search = {
   searchHistory: string[];
   isEventFocus: boolean;
   locationSearch: string;
+};
+
+export type EventDetail = {
+  eventTitle: string;
+  eventSummary: string;
+  eventStatus: string;
+  eventLocationsCreate: string;
+  eventOverview: string;
 };
