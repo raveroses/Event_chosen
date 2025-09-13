@@ -1,5 +1,5 @@
 "use client";
-import { ChangeEvent, KeyboardEvent, ReactNode } from "react";
+import { ChangeEvent, KeyboardEvent, ReactNode, useRef } from "react";
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -7,16 +7,15 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_API_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 import { Event, Search } from "../_types/types";
 import createcontext from "./CreateContext";
-import { EventDetail } from "../_types/types";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 const ContextProvider = ({ children }: { children: ReactNode }) => {
   const [eventData, setEventData] = useState<Event[]>([]);
   const [searchFocus, setSearchFocus] = useState<Search>({
     searchValue: "",
     locationSearch: "",
-    isFocus: false,
     searchHistory: [],
-    isEventFocus: false,
+    isSearchEventFocus: false,
+    isSearchLocationFocus: false,
   });
   const [eventLocation, setEventLocation] = useState<string>("");
 
@@ -25,7 +24,7 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
   // const [isClick,setIsClick]= useState<boolean>(false)
   const fetchingEvent = async () => {
     try {
-      const { data, error } = await supabase.from("evemtchoosen").select();
+      const { data, error } = await supabase.from("eventchoosen").select();
       console.log("Data=>", data, "Error", error);
       if (data !== null) {
         setEventData(data);
@@ -50,7 +49,6 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
 
     setEventDays(eventDay);
   };
-  //   console.log(eventData);
 
   //   Navbar
 
@@ -82,7 +80,10 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     if (!event || event.key === "Enter") {
       handleSearchValidation();
       const searchfiltering = eventData.filter((event) => {
-        return event.eventTitle.trim() === searchFocus.searchValue.trim();
+        return (
+          event.eventTitle.trim().toLowerCase() ===
+          searchFocus.searchValue.trim().toLowerCase()
+        );
       });
       setEventFilter([]);
       setEventLocation("");
@@ -97,26 +98,30 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
   const handleEventLocation = (location: string) => {
     setEventLocation(location);
   };
-  const handleFocus = () => {
-    setSearchFocus((prev) => ({ ...prev, isEventFocus: true }));
+
+  const handleSearchEventFocus = () => {
+    setSearchFocus((prev) => ({ ...prev, isSearchEventFocus: true }));
   };
-  const handleBlur = () => {
+
+  const handleSearchEventBlur = () => {
     setTimeout(() => {
       setSearchFocus((prev) => ({
         ...prev,
-        isEventFocus: false,
+        isSearchEventFocus: false,
       }));
     }, 1000);
   };
 
-  const handleEventBlur = () => {
-    setTimeout(() => {
-      setSearchFocus((prev) => ({ ...prev, isFocus: false }));
-    }, 1000);
+  // Location focus
+
+  const handleSearchLocationFocus = () => {
+    setSearchFocus((prev) => ({ ...prev, isSearchLocationFocus: true }));
   };
 
-  const handleEventFocus = () => {
-    setSearchFocus((prev) => ({ ...prev, isFocus: true }));
+  const handleSearchLocationBlur = () => {
+    setTimeout(() => {
+      setSearchFocus((prev) => ({ ...prev, isSearchLocationFocus: false }));
+    }, 1000);
   };
 
   // LOCATION FILTERING
@@ -124,14 +129,14 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     useState<string>("Venue");
   useEffect(() => {
     if (
-      eventLocation.trim() === "" ||
+      !eventLocation.trim() ||
       eventLocation.trim() === "Use my current location"
     ) {
-      setEventFilter(eventData);
+      setEventFilter([]);
     } else {
       const filtered = eventData.filter((event) => {
         return (
-          event.venue.trim().toLowerCase() ===
+          event.eventLocationsCreate.trim().toLowerCase() ===
           eventLocation.trim().toLowerCase()
         );
       });
@@ -142,33 +147,150 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [eventLocation, eventData, searchFocus.searchValue, eventInputSearch]);
 
-  const [eventDetailCreation, setEventDetailCreation] = useState<EventDetail>({
+  const [date, setDate] = useState<Date | string>("");
+  const [open, setOpen] = useState(false);
+
+  const [eventDetailCreation, setEventDetailCreation] = useState<Event>({
     eventTitle: "",
     eventSummary: "",
     eventStatus: "",
-    eventLocationsCreate: locationCreationChoosen.trim(),
+    eventLocationsCreate: "",
     eventOverview: "",
+    eventDate: "",
+    eventStartTime: "",
+    eventCategory: "",
+    eventImage: "",
   });
+
+  const [multipleEventCreation, setMultipleEventCreation] = useState<Event[]>(
+    []
+  );
+
+  const dateOnSelect = (date: Date) => {
+    setDate(date);
+    setOpen(false);
+    setEventDetailCreation((prev) => {
+      const convertDate = new Date(date);
+      const supabaseDate = `${convertDate.getFullYear()}-${String(
+        convertDate.getMonth() + 1
+      ).padStart(2, "0")}-${String(convertDate.getDate()).padStart(2, "0")}`;
+
+      const objSet = { ...prev, eventDate: supabaseDate };
+      return objSet;
+    });
+  };
 
   const handleEventCreationOnchange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
 
-    setEventDetailCreation((prev) => ({ ...prev, [name]: value.trim() }));
+    setEventDetailCreation((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
-
-  // const handleEventCreationValidation = () => {
-  //   if (!eventDetailCreation.eventTitle || !eventDetailCreation.eventSummary) {
-  //     toast.error("Please, Check all fields");
-  //     return;
-  //   }
-
-  // };
 
   const handleEventLocationChoosen = (locationName: string) => {
     setLocationCreationChoosen(locationName);
   };
+
+  const handleEventCreationValidation = () => {
+    if (
+      !eventDetailCreation.eventTitle.trim() ||
+      !eventDetailCreation.eventSummary.trim() ||
+      !eventDetailCreation.eventCategory.trim() ||
+      !eventDetailCreation.eventImage.trim() ||
+      !eventDetailCreation.eventOverview ||
+      !eventDetailCreation.eventStartTime.trim() ||
+      !eventDetailCreation.eventLocationsCreate.trim() ||
+      !eventDetailCreation.eventDate ||
+      !eventDetailCreation.eventStatus.trim()
+    ) {
+      // toast.error("Please, Check all fields");
+      alert("All fields are not fields");
+      return;
+    }
+
+    setMultipleEventCreation([eventDetailCreation]);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setEventDetailCreation((prev) => ({
+      ...prev,
+      eventCategory: value,
+    }));
+  };
+
+  const imageRef = useRef<HTMLInputElement | null>(null);
+  const [selectImageFile, setSelectImageFile] = useState<File | null>(null);
+  const handleImageOnchange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const file = e.target.files[0];
+    setSelectImageFile(file);
+
+    console.log(file);
+  };
+
+  const uploadFile = async (selectImage: File | null) => {
+    if (!selectImage) {
+      console.warn("No file selected");
+      return;
+    }
+
+    const filePath = `imageFolder/${Date.now()}_${selectImage.name}`;
+    const { data: data1, error } = await supabase.storage
+      .from("eventImage")
+      .upload(filePath, selectImage, {
+        upsert: true,
+      });
+    if (error) {
+      console.log(error);
+      return;
+    } else {
+      const { data } = supabase.storage
+        .from("eventImage")
+        .getPublicUrl(data1.path);
+
+      const publicUrl = data.publicUrl;
+
+      setEventDetailCreation((prev) => ({ ...prev, eventImage: publicUrl }));
+      console.log(data);
+    }
+  };
+
+  const handleEventDetailCreationSubmission = async () => {
+    handleEventCreationValidation();
+
+    const supabaseEvents = multipleEventCreation.map((event) => event);
+
+    const { data, error } = await supabase
+      .from("eventchoosen")
+      .insert(supabaseEvents);
+
+    console.log("DATA INSERT", data, "ERROR INSERT", error);
+    uploadFile(selectImageFile as File);
+
+    setEventDetailCreation({
+      eventTitle: "",
+      eventSummary: "",
+      eventStatus: "",
+      eventLocationsCreate: "",
+      eventOverview: "",
+      eventDate: "",
+      eventStartTime: "",
+      eventCategory: "",
+      eventImage: "",
+    });
+  };
+
+  console.log(selectImageFile);
+
+  const handleImageTrigger = () => {
+    imageRef.current?.click();
+  };
+
+  console.log(eventDetailCreation);
 
   return (
     <createcontext.Provider
@@ -180,10 +302,10 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
         handleSearchEventEnter,
         handleSeachFocus,
         searchFocus,
-        handleBlur,
-        handleFocus,
-        handleEventBlur,
-        handleEventFocus,
+        handleSearchEventFocus,
+        handleSearchEventBlur,
+        handleSearchLocationFocus,
+        handleSearchLocationBlur,
         eventFilter,
         eventInputSearch,
         handleAllClick,
@@ -192,6 +314,17 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
         handleEventCreationOnchange,
         handleEventLocationChoosen,
         locationCreationChoosen,
+        handleEventDetailCreationSubmission,
+        date,
+        // timesetter,
+        open,
+        setOpen,
+        dateOnSelect,
+        handleCategoryChange,
+        handleImageOnchange,
+        handleImageTrigger,
+        imageRef,
+        // timepicker,
       }}
     >
       {children}

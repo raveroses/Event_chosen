@@ -75,7 +75,7 @@ const LocationSearching = () => {
                     <Image
                       alt="card-image"
                       fill={true}
-                      src={`${event.image}`}
+                      src={`${event.eventImage}`}
                       className=" object-cover object-center rounded-t-2xl"
                     />
                   </div>
@@ -85,14 +85,14 @@ const LocationSearching = () => {
                       {event.eventTitle}
                     </h3>
                     <div className="timeandDate md:text-[12px] text-[16px] md:font-semibold font-medium">
-                      <span className="day"> {event.day}</span>
-                      <span> {event.date}</span>
-                      <span> {event.startTime} AMs</span>
+                      <span className="day"> {event.eventDate}</span>
+                      <span> {event.eventDate}</span>
+                      <span> {event.eventStartTime} AMs</span>
                     </div>
-                    <p className="text-[14px]">{event.content}</p>
+                    <p className="text-[14px]">{event.eventOverview}</p>
 
                     <h3 className="md:text-[13px] text-[14px] font-semibold">
-                      {event.category}
+                      {event.eventCategory}
                     </h3>
                   </div>
                 </div>

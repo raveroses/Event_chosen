@@ -92,7 +92,7 @@ const HeroSection = (): JSX.Element => {
   });
 
   return (
-    <div className="w-full min-w-full md:my-[120px] my-4  ">
+    <div className="w-full min-w-full md:my-[120px] my-[0px]  ">
       <Swiper
         modules={[Navigation, Pagination, Scrollbar, Autoplay]}
         spaceBetween={0}

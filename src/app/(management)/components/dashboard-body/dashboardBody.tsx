@@ -12,15 +12,6 @@ const DashboardFirstBody = () => {
       pcontent:
         "Add all of your event details and let attendees know what to expect",
     },
-    {
-      heading: "Add tickets",
-      pcontent: "",
-    },
-
-    {
-      heading: "Publish",
-      pcontent: "",
-    },
   ]);
   const { eventDetailCreation } = useAppContext();
 
@@ -67,7 +58,7 @@ const DashboardFirstBody = () => {
         </div>
       </div>
       <div className="steps">
-        <p className="text-[10px]">Steps</p>
+        <p className="text-[10px]">Step</p>
 
         <form action="" className=" flex gap-[5px] flex-col">
           {inputContent.map((item, index) => {

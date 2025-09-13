@@ -1,23 +1,24 @@
 import { ChangeEvent, KeyboardEvent, ReactNode } from "react";
 
 export type Event = {
-  category: string;
-  date: string;
-  day: string;
-  content: string;
+  eventCategory: string;
+  eventStatus: string;
+  eventDate: string;
+  eventOverview: string;
+  eventLocationsCreate: string;
+  eventSummary: string;
   eventTitle: string;
-  startTime: string;
-  image: string;
-  venue: string;
+  eventImage: string;
+  eventStartTime: string;
 };
 export type Context = {
   handleSeachFocus: (e: ChangeEvent<HTMLInputElement>) => void;
   handleSearchEventEnter: (event?: KeyboardEvent<HTMLInputElement>) => void;
   handleClear: () => void;
-  handleBlur: () => void;
-  handleFocus: () => void;
-  handleEventBlur: () => void;
-  handleEventFocus: () => void;
+  handleSearchEventBlur: () => void;
+  handleSearchEventFocus: () => void;
+  handleSearchLocationFocus: () => void;
+  handleSearchLocationBlur: () => void;
   handleEventLocation: (location: string) => void;
   eventLocation: string;
   searchFocus: Search;
@@ -29,9 +30,20 @@ export type Context = {
   handleEventCreationOnchange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
-  eventDetailCreation: EventDetail;
+  eventDetailCreation: Event;
   handleEventLocationChoosen: (locationName: string) => void;
   locationCreationChoosen: string;
+  handleEventDetailCreationSubmission: () => void;
+  date: Date | string;
+  // timesetter: string;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  dateOnSelect: (date: Date) => void;
+  // timepicker: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleCategoryChange: (value: string) => void;
+  handleImageOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleImageTrigger: () => void;
+  imageRef: React.RefObject<HTMLInputElement | null>;
 };
 
 export type InputCard = {
@@ -40,16 +52,16 @@ export type InputCard = {
 
 export type Search = {
   searchValue: string;
-  isFocus: boolean;
   searchHistory: string[];
-  isEventFocus: boolean;
   locationSearch: string;
+  isSearchEventFocus: boolean;
+  isSearchLocationFocus: boolean;
 };
 
-export type EventDetail = {
-  eventTitle: string;
-  eventSummary: string;
-  eventStatus: string;
-  eventLocationsCreate: string;
-  eventOverview: string;
-};
+// export type EventDetail = {
+//   eventTitle: string;
+//   eventSummary: string;
+//   eventStatus: string;
+//   eventLocationsCreate: string;
+//   eventOverview: string;
+// };
