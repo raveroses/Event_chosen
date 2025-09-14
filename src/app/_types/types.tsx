@@ -44,6 +44,7 @@ export type Context = {
   handleImageOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
   handleImageTrigger: () => void;
   imageRef: React.RefObject<HTMLInputElement | null>;
+  previewImage: string | null;
 };
 
 export type InputCard = {

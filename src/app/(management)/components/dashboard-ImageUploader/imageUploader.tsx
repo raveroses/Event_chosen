@@ -11,17 +11,15 @@ const ImageUploader = () => {
     handleImageOnchange,
     handleImageTrigger,
     imageRef,
-    eventDetailCreation,
+    previewImage,
   } = useAppContext();
-
   return (
     <section className="md:w-[800px] w-full min-width-full md:overflow-y-scroll overflow-none flex flex-col gap-[10px] md:gap-[100px]  ">
       <div
-        className={`relative background 
-  
-    bg-[url(${eventDetailCreation.eventImage ?? "/images/herosec.jpeg"})]
-
-      w-full md:h-[400px] h-[300px] min-w-full md:rounded-2xl`}
+        className={`relative background w-full md:h-[400px] h-[300px] min-w-full md:rounded-2xl`}
+        style={{
+          backgroundImage: `url(${previewImage || "/images/herosec.jpeg"})`,
+        }}
       >
         <div className="absolute top-[10px] md:left-[740px] left-[90%] bg-white text-[#3659e3] rounded-full text-center p-[8px] font-bold">
           <FaPlus />
@@ -54,7 +52,7 @@ const ImageUploader = () => {
         <EventTitle />
         <Date />
         <Overview />
-        <div className="flex justify-end">
+        <div className="flex md:justify-end justify-center">
           <button
             className="border bg-[#9f2c15] rounded text-white w-[200px] py-[10px] text-[16px] "
             onClick={handleEventDetailCreationSubmission}

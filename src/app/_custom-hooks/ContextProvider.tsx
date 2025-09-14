@@ -193,14 +193,22 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
 
   const handleEventLocationChoosen = (locationName: string) => {
     setLocationCreationChoosen(locationName);
+    setEventDetailCreation((prev) => ({
+      ...prev,
+      eventLocationsCreate: locationName,
+    }));
   };
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const imageRef = useRef<HTMLInputElement | null>(null);
+  const [selectImageFile, setSelectImageFile] = useState<File | null>(null);
 
-  const handleEventCreationValidation = () => {
+  const handleEventCreationValidation = (): boolean => {
     if (
       !eventDetailCreation.eventTitle.trim() ||
       !eventDetailCreation.eventSummary.trim() ||
       !eventDetailCreation.eventCategory.trim() ||
-      !eventDetailCreation.eventImage.trim() ||
+      // !eventDetailCreation.eventImage.trim() ||
+      !selectImageFile?.name ||
       !eventDetailCreation.eventOverview ||
       !eventDetailCreation.eventStartTime.trim() ||
       !eventDetailCreation.eventLocationsCreate.trim() ||
@@ -208,11 +216,12 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
       !eventDetailCreation.eventStatus.trim()
     ) {
       // toast.error("Please, Check all fields");
+      setPreviewImage("");
       alert("All fields are not fields");
-      return;
+      return false;
     }
 
-    setMultipleEventCreation([eventDetailCreation]);
+    return true;
   };
 
   const handleCategoryChange = (value: string) => {
@@ -222,14 +231,12 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
-  const imageRef = useRef<HTMLInputElement | null>(null);
-  const [selectImageFile, setSelectImageFile] = useState<File | null>(null);
   const handleImageOnchange = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const file = e.target.files[0];
     setSelectImageFile(file);
-
-    console.log(file);
+    const previewUrl = URL.createObjectURL(file);
+    setPreviewImage(previewUrl);
   };
 
   const uploadFile = async (selectImage: File | null) => {
@@ -255,12 +262,13 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
       const publicUrl = data.publicUrl;
 
       setEventDetailCreation((prev) => ({ ...prev, eventImage: publicUrl }));
-      console.log(data);
     }
+    setMultipleEventCreation([eventDetailCreation]);
   };
 
   const handleEventDetailCreationSubmission = async () => {
-    handleEventCreationValidation();
+    if (!handleEventCreationValidation()) return;
+    await uploadFile(selectImageFile as File);
 
     const supabaseEvents = multipleEventCreation.map((event) => event);
 
@@ -269,7 +277,6 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
       .insert(supabaseEvents);
 
     console.log("DATA INSERT", data, "ERROR INSERT", error);
-    uploadFile(selectImageFile as File);
 
     setEventDetailCreation({
       eventTitle: "",
@@ -284,13 +291,12 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  console.log(selectImageFile);
-
   const handleImageTrigger = () => {
     imageRef.current?.click();
   };
 
   console.log(eventDetailCreation);
+  console.log(selectImageFile);
 
   return (
     <createcontext.Provider
@@ -316,7 +322,6 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
         locationCreationChoosen,
         handleEventDetailCreationSubmission,
         date,
-        // timesetter,
         open,
         setOpen,
         dateOnSelect,
@@ -324,7 +329,7 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
         handleImageOnchange,
         handleImageTrigger,
         imageRef,
-        // timepicker,
+        previewImage,
       }}
     >
       {children}
