@@ -1,10 +1,16 @@
 "use client";
 
 import useAppContext from "@/app/_custom-hooks/useAppContext";
+import { useState } from "react";
 import { FaPlus } from "react-icons/fa6";
 
 const Overview = () => {
   const { handleEventCreationOnchange, eventDetailCreation } = useAppContext();
+  const [isOverViewOpen, setOverViewOpen] = useState<boolean>(false);
+
+  const handleOverViewOpen = () => {
+    setOverViewOpen((prev) => !prev);
+  };
 
   return (
     <section className=" border-2 border-gray-200 hover:border-[#3659e3] md:p-[30px] p-[15px] md:rounded-xl transition-all duration-200 md:bg-transparent bg-white">
@@ -17,7 +23,7 @@ const Overview = () => {
             options—anything that will help people know what to expect.
           </p>
 
-          <div className="hidd">
+          <div className={`${isOverViewOpen ? "block" : "hidden"}`}>
             <div className="text-[14px] flex gap-[15px] flex-col">
               <p>
                 Add more details about your event and include what people can
@@ -39,7 +45,10 @@ const Overview = () => {
           </div>
         </div>
 
-        <div className="bg-gray-100 text-[#3659e3] rounded-full text-[17px] text-center p-[8px] font-bold">
+        <div
+          className="bg-gray-100 text-[#3659e3] rounded-full text-[17px] text-center p-[8px] font-bold"
+          onClick={handleOverViewOpen}
+        >
           <FaPlus />
         </div>
       </div>

@@ -51,9 +51,11 @@ const Date = () => {
   ]);
 
   const [isLocationFocus, setIsLocationFocus] = useState<boolean>(false);
-  //   const handleIsLocationFocus = () => {
-  //     setIsLocationFocus(true);
-  //   };
+  const [isDateOpen, setDateOpen] = useState<boolean>(false);
+
+  const handleDateOpen = () => {
+    setDateOpen((prev) => !prev);
+  };
 
   return (
     <section className="border-2 border-gray-200 hover:border-[#3659e3] md:p-[30px] p-[15px] md:rounded-xl transition-all duration-200 md:bg-transparent bg-white">
@@ -79,12 +81,19 @@ const Date = () => {
             />
           </div>
         </div>
-        <div className="bg-gray-100 text-[#3659e3] rounded-full text-[17px] text-center p-[8px] font-bold">
+        <div
+          className="bg-gray-100 text-[#3659e3] rounded-full text-[17px] text-center p-[8px] font-bold"
+          onClick={handleDateOpen}
+        >
           <FaPlus />
         </div>
       </div>
 
-      <div className="flex flex-col gap-[25px] ">
+      <div
+        className={`flex flex-col gap-[25px] ${
+          isDateOpen ? "block" : "hidden"
+        } `}
+      >
         <h2 className="text-[18px] font-bold">Date and location</h2>
 
         <h2 className="text-[15px] text-gray-600">Type of Event</h2>
@@ -157,13 +166,13 @@ const Date = () => {
               name="eventLocationsCreate"
               onChange={handleEventCreationOnchange}
               value={eventDetailCreation.eventLocationsCreate}
-              className="w-full border rounded py-[14px] placeholder:px-[40px]  p-5 placeholder:text-[20px]"
+              className="w-full border rounded py-[14px] px-[25px] placeholder:px-[40px] placeholder:text-[20px]"
               placeholder="location"
               onFocus={() => setIsLocationFocus(true)}
               onBlur={() => setIsLocationFocus(false)}
             />
             <div
-              className={`absolute top-[13px] text-[25px] left-[10px] ${
+              className={`absolute top-[13px] left-0 text-[25px] ${
                 !isLocationFocus ? "block" : "hidden"
               }`}
             >
