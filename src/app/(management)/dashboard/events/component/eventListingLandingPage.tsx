@@ -5,6 +5,7 @@ import { FaList, FaPlus, FaRegCalendar } from "react-icons/fa6";
 import { PiCaretDownBold } from "react-icons/pi";
 import { BiCalendarAlt } from "react-icons/bi";
 import Overlay from "./Overlay";
+import useAppContext from "@/app/_custom-hooks/useAppContext";
 const EventListingLandingPage = () => {
   const [createList] = useState<
     {
@@ -25,6 +26,8 @@ const EventListingLandingPage = () => {
       list: "All events",
     },
   ]);
+
+  const { handleEventCreationPlus } = useAppContext();
   return (
     <>
       <h1 className="text-[40px] font-bold">Events</h1>
@@ -60,7 +63,10 @@ const EventListingLandingPage = () => {
           </div>
         </div>
 
-        <button className="create bg-[#9f2c15] text-center text-white  rounded py-[15px] px-[30px] text-[14px] md:block hidden">
+        <button
+          className="create bg-[#9f2c15] text-center text-white  rounded py-[15px] px-[30px] text-[14px] md:block hidden"
+          onClick={handleEventCreationPlus}
+        >
           Create events
         </button>
       </div>
@@ -72,7 +78,10 @@ const EventListingLandingPage = () => {
         <h3 className="pt-[20px] text-gray-400">No events to show</h3>
       </div>
 
-      <div className="plusCreate absolute bg-[#9f2c15] rounded-full p-5 shadow shadow-[#9f2c15] text-semibold text-white inline right-0 bottom-0 md:hidden">
+      <div
+        className="plusCreate absolute bg-[#9f2c15] rounded-full p-5 shadow shadow-[#9f2c15] text-semibold text-white inline right-0 bottom-0 md:hidden"
+        onClick={handleEventCreationPlus}
+      >
         <FaPlus />
       </div>
 

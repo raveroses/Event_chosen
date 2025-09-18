@@ -45,6 +45,10 @@ export type Context = {
   handleImageTrigger: () => void;
   imageRef: React.RefObject<HTMLInputElement | null>;
   previewImage: string | null;
+  handleMenuDisplay: () => void;
+  menuDisplay: boolean;
+  handleEventCreationPlus: () => void;
+  eventCreation: boolean;
 };
 
 export type InputCard = {

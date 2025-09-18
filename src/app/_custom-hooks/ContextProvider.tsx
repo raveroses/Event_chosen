@@ -297,6 +297,18 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
 
   console.log(eventDetailCreation);
   console.log(selectImageFile);
+  // DASHBOARD/Event
+
+  const [menuDisplay, setMenuDisplay] = useState<boolean>(false);
+
+  const handleMenuDisplay = () => {
+    setMenuDisplay((prev) => !prev);
+  };
+  const [eventCreation, setEventCreation] = useState<boolean>(false);
+
+  const handleEventCreationPlus = () => {
+    setEventCreation((prev) => !prev);
+  };
 
   return (
     <createcontext.Provider
@@ -330,6 +342,10 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
         handleImageTrigger,
         imageRef,
         previewImage,
+        handleMenuDisplay,
+        menuDisplay,
+        handleEventCreationPlus,
+        eventCreation,
       }}
     >
       {children}

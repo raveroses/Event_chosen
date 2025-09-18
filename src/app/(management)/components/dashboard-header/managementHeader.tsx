@@ -1,10 +1,15 @@
+"use client";
+import useAppContext from "@/app/_custom-hooks/useAppContext";
 import { MobileLogo } from "@/app/_logo-sizes/Logo";
 import { DesktopLogo } from "@/app/_logo-sizes/Logo";
 import { CgMenuGridR } from "react-icons/cg";
 import { FaPlus } from "react-icons/fa6";
 import { MdOutlineNotifications } from "react-icons/md";
 import { PiCaretDownBold } from "react-icons/pi";
+import Link from "next/link";
 const ManagmentHeader = () => {
+  const { handleMenuDisplay } = useAppContext();
+
   return (
     <header className="flex justify-between items-center border-b border-gray-200 p-[15px]">
       <div className="md:hidden">
@@ -14,7 +19,7 @@ const ManagmentHeader = () => {
         <DesktopLogo />
       </div>
 
-      <div className="md:hidden text-[25px]">
+      <div className="md:hidden text-[25px]" onClick={handleMenuDisplay}>
         <CgMenuGridR />
       </div>
 
@@ -23,7 +28,9 @@ const ManagmentHeader = () => {
           <div className="text-[14px]">
             <FaPlus />
           </div>
-          <h3 className="text-[13px] md:block hidden ">Create</h3>
+          <Link href="/dashboard">
+            <h3 className="text-[13px] md:block hidden ">Create</h3>
+          </Link>
         </div>
         <div className="notification-icon text-[25px] cursor-pointer hover:bg-gray-200 p-1">
           <MdOutlineNotifications />
