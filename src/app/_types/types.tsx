@@ -49,6 +49,7 @@ export type Context = {
   menuDisplay: boolean;
   handleEventCreationPlus: () => void;
   eventCreation: boolean;
+  handleGoogleSignIn: () => Promise<void>;
 };
 
 export type InputCard = {

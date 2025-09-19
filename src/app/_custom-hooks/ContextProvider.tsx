@@ -295,8 +295,6 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     imageRef.current?.click();
   };
 
-  console.log(eventDetailCreation);
-  console.log(selectImageFile);
   // DASHBOARD/Event
 
   const [menuDisplay, setMenuDisplay] = useState<boolean>(false);
@@ -308,6 +306,17 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
 
   const handleEventCreationPlus = () => {
     setEventCreation((prev) => !prev);
+  };
+
+  // STARTING OF SUPABSE
+
+  const handleGoogleSignIn = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `http://localhost:3000/`,
+      },
+    });
   };
 
   return (
@@ -346,6 +355,7 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
         menuDisplay,
         handleEventCreationPlus,
         eventCreation,
+        handleGoogleSignIn,
       }}
     >
       {children}

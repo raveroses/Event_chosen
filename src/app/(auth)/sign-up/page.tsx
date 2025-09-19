@@ -1,9 +1,9 @@
-import VideoBackground from "./component/videoBackground";
+import SignUpcomp from "./component/SignUpcomp";
 const SignUp = () => {
   return (
-    <section>
-      <VideoBackground />
-    </section>
+    <>
+      <SignUpcomp />;
+    </>
   );
 };
 
