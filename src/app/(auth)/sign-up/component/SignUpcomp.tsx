@@ -4,7 +4,13 @@ import { FaApple, FaFacebook } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
 const SignUpcomp = () => {
-  const { handleGoogleSignIn } = useAppContext();
+  const {
+    handleGoogleSignIn,
+    handleFacebook,
+    handleSignUpOnchange,
+    authenticationDetail,
+    handleSignUpFormContinuation,
+  } = useAppContext();
   return (
     <section className="SignUp absolute md:top-[120px] top-[0px] md:left-[700px] bg-white md:w-[500px] w-full md:h-[700px]  h-[750px] opacity-75 md:px-[35px] px-[20px] py-[50px] z-30 ">
       <DesktopLogo />
@@ -13,13 +19,14 @@ const SignUpcomp = () => {
         <h2>Welcome!</h2>
         <h2>Whats your email?</h2>
       </div>
-      <form>
+      <form onSubmit={handleSignUpFormContinuation}>
         <input
           type="email"
-          name=""
-          id=""
+          name="signUpEmail"
           placeholder="Email"
+          value={authenticationDetail.signUpEmail}
           className="border w-full  p-[15px]"
+          onChange={handleSignUpOnchange}
         />
         <button className="w-full  text-white bg-[#d1410c] p-2 rounded my-[30px] ">
           Continue
@@ -45,7 +52,10 @@ const SignUpcomp = () => {
         >
           <FcGoogle />
         </div>
-        <div className="Facebook text-[25px] border border-gray-600 p-3 rounded">
+        <div
+          className="Facebook text-[25px] border border-gray-600 p-3 rounded"
+          onClick={handleFacebook}
+        >
           <FaFacebook />
         </div>
       </div>

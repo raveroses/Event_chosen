@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEvent, ReactNode } from "react";
+import { ChangeEvent, FormEvent, KeyboardEvent, ReactNode } from "react";
 
 export type Event = {
   eventCategory: string;
@@ -50,6 +50,14 @@ export type Context = {
   handleEventCreationPlus: () => void;
   eventCreation: boolean;
   handleGoogleSignIn: () => Promise<void>;
+  handleFacebook: () => Promise<void>;
+  handleSignUpOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
+  authenticationDetail: AuthenticatedDetail;
+  handleSignUpFormContinuation: (e: FormEvent<HTMLFormElement>) => void;
+  signUpNewUser: (e: FormEvent<HTMLFormElement>) => Promise<void>;
+  signInWithEmail: (e: FormEvent<HTMLFormElement>) => Promise<void>;
+  handleOneTime: (e: FormEvent<HTMLFormElement>) => Promise<void>;
+  handeResetPassword: (e: FormEvent<HTMLFormElement>) => Promise<void>;
 };
 
 export type InputCard = {
@@ -64,6 +72,12 @@ export type Search = {
   isSearchLocationFocus: boolean;
 };
 
+export type AuthenticatedDetail = {
+  signUpEmail: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+};
 // export type EventDetail = {
 //   eventTitle: string;
 //   eventSummary: string;

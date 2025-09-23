@@ -1,5 +1,11 @@
 "use client";
-import { ChangeEvent, KeyboardEvent, ReactNode, useRef } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  KeyboardEvent,
+  ReactNode,
+  useRef,
+} from "react";
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -7,6 +13,8 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_API_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 import { Event, Search } from "../_types/types";
 import createcontext from "./CreateContext";
+import { AuthenticatedDetail } from "../_types/types";
+import { useRouter } from "next/navigation";
 // import { toast } from "react-toastify";
 const ContextProvider = ({ children }: { children: ReactNode }) => {
   const [eventData, setEventData] = useState<Event[]>([]);
@@ -319,6 +327,158 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const handleFacebook = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "facebook",
+      options: {
+        redirectTo: "http://localhost:3000/",
+      },
+    });
+
+    if (error) {
+      console.error("Facebook login error:", error.message);
+    } else {
+      console.log("Redirecting to Facebook:", data);
+    }
+  };
+
+  const [authenticationDetail, setAuthenticationDetail] =
+    useState<AuthenticatedDetail>({
+      signUpEmail: "",
+      firstName: "",
+      lastName: "",
+      password: "",
+    });
+
+  const handleSignUpOnchange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setAuthenticationDetail((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const isEmail = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{3,}$/;
+
+  const router = useRouter();
+
+  const handleSignUpFormContinuation = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (
+      !isEmail.test(authenticationDetail.signUpEmail.trim()) ||
+      !authenticationDetail.signUpEmail
+    ) {
+      console.log("Invalid email");
+      return;
+    }
+
+    router.push("/user-detail");
+  };
+  console.log(authenticationDetail);
+
+  const signUpNewUser = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (
+      !authenticationDetail.firstName.trim() ||
+      !authenticationDetail.lastName.trim() ||
+      !authenticationDetail.password.trim() ||
+      !isEmail.test(authenticationDetail.signUpEmail.trim())
+    ) {
+      console.log("Invalid Inputs");
+      return;
+    }
+    const { data, error } = await supabase.auth.signUp({
+      email: authenticationDetail.signUpEmail.trim(),
+      password: authenticationDetail.password.trim(),
+      options: {
+        data: {
+          displayName:
+            authenticationDetail.firstName.trim() +
+            " " +
+            authenticationDetail.lastName.trim(),
+        },
+      },
+    });
+
+    if (error) {
+      console.error("Supabase error:", error.message);
+      return;
+    }
+    console.log("=> DATA", data);
+    router.push("/login");
+    setAuthenticationDetail({
+      signUpEmail: "",
+      firstName: "",
+      lastName: "",
+      password: "",
+    });
+  };
+
+  const signInWithEmail = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (
+      !authenticationDetail.password.trim() ||
+      !isEmail.test(authenticationDetail.signUpEmail.trim())
+    ) {
+      console.log("Invalid Inputs");
+      return;
+    }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: authenticationDetail.signUpEmail.trim(),
+      password: authenticationDetail.password,
+    });
+
+    if (error) {
+      console.error("Supabase error:", error.message);
+      return;
+    }
+    console.log("=> DATA", data);
+    router.push("/");
+  };
+
+  const handleOneTime = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email: authenticationDetail.signUpEmail,
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: "http://localhost:3000",
+      },
+    });
+    if (error) {
+      console.error("Supabase error:", error.message);
+      return;
+    }
+
+    router.push("/one-time");
+    console.log("=> DATA", data);
+    setAuthenticationDetail({
+      signUpEmail: "",
+      firstName: "",
+      lastName: "",
+      password: "",
+    });
+  };
+
+  const handeResetPassword = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!isEmail.test(authenticationDetail.signUpEmail.trim())) {
+      console.log("Invalid Inputs");
+      return;
+    }
+    const { data, error } = await supabase.auth.resetPasswordForEmail(
+      authenticationDetail.signUpEmail,
+      {
+        redirectTo: "http://localhost:3000/login",
+      }
+    );
+    if (error) {
+      console.error("Supabase error:", error.message);
+      return;
+    }
+
+    console.log("=> DATA", data);
+  };
   return (
     <createcontext.Provider
       value={{
@@ -356,6 +516,14 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
         handleEventCreationPlus,
         eventCreation,
         handleGoogleSignIn,
+        handleFacebook,
+        authenticationDetail,
+        handleSignUpOnchange,
+        handleSignUpFormContinuation,
+        signUpNewUser,
+        signInWithEmail,
+        handleOneTime,
+        handeResetPassword,
       }}
     >
       {children}
