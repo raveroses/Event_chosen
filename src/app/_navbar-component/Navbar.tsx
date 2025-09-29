@@ -131,8 +131,8 @@ const Navbar = () => {
             </div>
 
             <div
-              className={`absolute top-20  left-[200px] 
-                 w-[340px] p-5 z-30 rounded-xl z-30 bg-white       
+              className={`absolute top-20  left-[350px] 
+                 w-[340px] p-5  rounded-xl z-30 bg-white       
                ${searchFocus.isSearchEventFocus ? "md:block hidden" : "hidden"}
                  `}
             >
@@ -196,7 +196,7 @@ const Navbar = () => {
         <div
           className={`${
             searchFocus.isSearchLocationFocus ? "md:block hidden" : "hidden"
-          }  absolute top-20 left-[530px] bg-white w-[350px]
+          }  absolute top-20 left-[740px] bg-white w-[350px]
            h-[150px] p-5 rounded shadow`}
         >
           <div className={`card flex flex-col gap-[20px]  `}>

@@ -8,11 +8,12 @@ const PasswordReset = () => {
     <section className="SignUp absolute md:top-[170px] top-[0px] md:left-[700px] bg-white md:w-[500px] w-full md:h-[500px]  h-[750px] opacity-75 md:px-[35px] px-[20px] py-[50px] z-30 ">
       <DesktopLogo />
 
-      <div className="text-[35px] font-bold py-[45px]">
-        <h2>Welcome!</h2>
-        <h2>Whats your email?</h2>
+      <div className="text-[25px] font-bold py-[45px]">
+        <h2>👋 Hey sorry about your password!</h2>
       </div>
       <form onSubmit={handeResetPassword}>
+        <h2 className="py-5 text-[25px] font-bold">Whats your email?</h2>
+
         <input
           type="email"
           name="signUpEmail"

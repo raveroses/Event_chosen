@@ -48,6 +48,21 @@ const UserDetail = () => {
           className="border-2 w-full p-[12px] rounded placeholder:text-[13px] font-semibold"
           placeholder="Enter password"
         />
+        {/* 
+        <div className="flex items-center gap-[50px]">
+          <div>
+            <input type="radio" name="" id="" />
+            <label htmlFor="organizer" className="pl-1">
+              Event organizer
+            </label>
+          </div>
+          <div>
+            <input type="radio" name="" id="" />
+            <label htmlFor="organizer" className="pl-1">
+              Non-organizer
+            </label>
+          </div>
+        </div> */}
         <button className="w-full text-white bg-[#d1410c] p-[13px] rounded my-[5px] text-[13px] font-bold">
           Submit
         </button>

@@ -1,4 +1,4 @@
-import VideoBackground from "./sign-up/component/videoBackground";
+import VideoBackground from "./_videoBackground/videoBackground";
 export default function AuthLayout({
   children,
 }: {

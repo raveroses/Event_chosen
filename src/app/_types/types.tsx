@@ -58,6 +58,7 @@ export type Context = {
   signInWithEmail: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   handleOneTime: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   handeResetPassword: (e: FormEvent<HTMLFormElement>) => Promise<void>;
+  handlePasswordChangerInput: (e: FormEvent<HTMLFormElement>) => Promise<void>;
 };
 
 export type InputCard = {
