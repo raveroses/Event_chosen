@@ -59,6 +59,8 @@ export type Context = {
   handleOneTime: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   handeResetPassword: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   handlePasswordChangerInput: (e: FormEvent<HTMLFormElement>) => Promise<void>;
+  userChoiceList: userChoice[];
+  handleUserChoice: (id: string) => Promise<void>;
 };
 
 export type InputCard = {
@@ -79,6 +81,20 @@ export type AuthenticatedDetail = {
   lastName: string;
   password: string;
 };
+
+export type userChoice = {
+  url: string;
+  heading: string;
+  paragraph: string;
+};
+
+export type UserProfile = {
+  id: string;
+  role: string;
+  email: string;
+  isOrganizer: boolean;
+};
+
 // export type EventDetail = {
 //   eventTitle: string;
 //   eventSummary: string;

@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
 import { DesktopLogo } from "@/app/_logo-sizes/Logo";
 const UserDetail = () => {
@@ -66,6 +66,9 @@ const UserDetail = () => {
         <button className="w-full text-white bg-[#d1410c] p-[13px] rounded my-[5px] text-[13px] font-bold">
           Submit
         </button>
+        <Link href="/login" className="text-center text-[#3659e3]">
+          Already have an account, Login
+        </Link>
       </form>
     </section>
   );
