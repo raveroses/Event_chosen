@@ -13,10 +13,9 @@ export function useEventCreation() {
     eventStartTime: "",
     eventCategory: "",
     eventImage: "",
+    // user_id: "",
   });
-  const [multipleEventCreation, setMultipleEventCreation] = useState<Event[]>(
-    []
-  );
+
   const [date, setDate] = useState<Date | string>("");
   const [open, setOpen] = useState(false);
   const [locationCreationChoosen, setLocationCreationChoosen] =
@@ -83,51 +82,49 @@ export function useEventCreation() {
     setPreviewImage(previewUrl);
   };
 
-  const uploadFile = async (selectImage: File | null) => {
-    if (!selectImage) {
-      toast.error("No file selected");
-
-      return;
-    }
-    const filePath = `imageFolder/${Date.now()}_${selectImage.name}`;
-    const { data: data1, error } = await supabase.storage
-      .from("eventImage")
-      .upload(filePath, selectImage, { upsert: true });
-    if (error) {
-      console.log(error);
-      return;
-    } else {
-      const { data } = supabase.storage
-        .from("eventImage")
-        .getPublicUrl(data1.path);
-      const publicUrl = data.publicUrl;
-      setEventDetailCreation((prev) => ({ ...prev, eventImage: publicUrl }));
-    }
-    setMultipleEventCreation([eventDetailCreation]);
-  };
-
   const handleEventDetailCreationSubmission = async () => {
+    console.log("I'm clicked");
     if (!handleEventCreationValidation()) return;
-    await uploadFile(selectImageFile as File);
-    const supabaseEvents = multipleEventCreation.map((event) => event);
-    const { data, error } = await supabase
-      .from("eventchoosen")
-      .insert(supabaseEvents);
+    if (!selectImageFile) {
+      toast.error("No file selected");
+      return;
+    }
+    const filePath = `imagefolders/${Date.now()}_${selectImageFile.name}`;
 
-    console.log("DATA=>", data, "ERROR=>", error);
-    setEventDetailCreation({
-      eventTitle: "",
-      eventSummary: "",
-      eventStatus: "",
-      eventLocationsCreate: "",
-      eventOverview: "",
-      eventDate: "",
-      eventStartTime: "",
-      eventCategory: "",
-      eventImage: "",
-    });
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("eventimages")
+      .upload(filePath, selectImageFile, { upsert: true });
+
+    console.log("DATA1", uploadData);
+    if (!uploadData || uploadError) {
+      console.log("ImageUploadError=>", uploadError);
+      return;
+    }
+    const { data: urlData } = supabase.storage
+      .from("eventimages")
+      .getPublicUrl(uploadData.path);
+    const publicUrl = urlData.publicUrl;
+    console.log(publicUrl);
+    const updatedEvent = { ...eventDetailCreation, eventImage: publicUrl };
+    setEventDetailCreation(updatedEvent);
+    const { data: insertData, error: insertError } = await supabase
+      .from("eventchosen_duplicate")
+      .insert(updatedEvent);
+
+    console.log("DATA=>", insertData, "ERROR=>", insertError);
+    // setEventDetailCreation({
+    //   eventTitle: "",
+    //   eventSummary: "",
+    //   eventStatus: "",
+    //   eventLocationsCreate: "",
+    //   eventOverview: "",
+    //   eventDate: "",
+    //   eventStartTime: "",
+    //   eventCategory: "",
+    //   eventImage: "",
+    // });
   };
-
+  console.log(eventDetailCreation);
   const handleImageTrigger = () => {
     imageRef.current?.click();
   };

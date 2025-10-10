@@ -10,6 +10,7 @@ export type Event = {
   eventTitle: string;
   eventImage: string;
   eventStartTime: string;
+  user_id?: string;
 };
 export type Context = {
   handleSeachFocus: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -89,10 +90,8 @@ export type userChoice = {
 };
 
 export type UserProfile = {
-  id: string;
-  role: string;
+  roles: string;
   email: string;
-  isOrganizer: boolean;
 };
 
 // export type EventDetail = {

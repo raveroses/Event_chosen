@@ -13,64 +13,59 @@ export function useAuth() {
   const [userChoiceList] = useState<userChoice[]>([
     {
       url: "/images/guy.png",
-      heading: "Find an event",
+      heading: "attendee",
       paragraph: " Tell us what you love",
     },
     {
       url: "/images/girl.png",
-      heading: "Organize an event",
+      heading: "organizer",
       paragraph: "Plan your best event ever",
     },
   ]);
+
+  const [loading, setLoading] = useState<boolean>(false);
+
   const router = useRouter();
 
-  // const [userLoginChoice, setUserIUserLoginChoice] = useState<string>("");
   const [insertPayload, setInsertPayLoad] = useState<UserProfile>({
-    id: "",
     email: "",
-    role: "",
-    isOrganizer: false,
+    roles: "",
   });
 
-  const handleUserChoice = async (id: string) => {
+  const handleUserChoice = async (rolesChoice: string) => {
     const {
       data: { session },
       error,
     } = await supabase.auth.getSession();
-    if (!session?.user) {
-      console.log(error);
+
+    if (error || !session?.user) {
+      console.log("No active session:", error);
       return;
     }
-    setInsertPayLoad((prev) => ({
-      ...prev,
-      id: session.user.id,
-      email: session.user.email!,
-      role: id,
-      isOrganizer: id.toLowerCase().startsWith("organize"),
-    }));
 
-    console.log("Stalker", session);
-  };
+    console.log("Session UID:", session.user.id);
 
-  useEffect(() => {
-    const userTableCreations = async () => {
-      if (!insertPayload.role) {
-        return;
-      }
-
-      const { data: user, error } = await supabase
-        .from("users")
-        .insert([insertPayload])
-        .select();
-
-      if (error) {
-        console.error("Insert error:", error);
-      } else {
-        console.log("Inserted user:", user);
-      }
+    const payload: UserProfile = {
+      email: session.user.email ?? "",
+      roles: rolesChoice.trim(),
     };
-    userTableCreations();
-  }, [insertPayload]);
+
+    setInsertPayLoad(payload);
+
+    console.log("PAYLOAD:", payload);
+
+    const { data: user, error: insertError } = await supabase
+      .from("users")
+      .insert(payload)
+      .select();
+
+    if (insertError) {
+      console.error("Insert error:", insertError);
+    } else {
+      console.log("Inserted user:", user);
+      router.push("/");
+    }
+  };
 
   const [authenticationDetail, setAuthenticationDetail] =
     useState<AuthenticatedDetail>({
@@ -90,15 +85,16 @@ export function useAuth() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    setLoading(true);
     if (
       !isEmail.test(authenticationDetail.signUpEmail.trim()) ||
       !authenticationDetail.signUpEmail
     ) {
       toast.error("Re-check all fields");
       return;
-    } else {
-      router.push("/user-detail");
     }
+    router.push("/user-detail");
+    setLoading(false);
   };
 
   const signUpNewUser = async (e: React.FormEvent<HTMLFormElement>) => {
