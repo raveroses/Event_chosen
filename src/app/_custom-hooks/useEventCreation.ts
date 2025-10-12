@@ -112,17 +112,17 @@ export function useEventCreation() {
       .insert(updatedEvent);
 
     console.log("DATA=>", insertData, "ERROR=>", insertError);
-    // setEventDetailCreation({
-    //   eventTitle: "",
-    //   eventSummary: "",
-    //   eventStatus: "",
-    //   eventLocationsCreate: "",
-    //   eventOverview: "",
-    //   eventDate: "",
-    //   eventStartTime: "",
-    //   eventCategory: "",
-    //   eventImage: "",
-    // });
+    setEventDetailCreation({
+      eventTitle: "",
+      eventSummary: "",
+      eventStatus: "",
+      eventLocationsCreate: "",
+      eventOverview: "",
+      eventDate: "",
+      eventStartTime: "",
+      eventCategory: "",
+      eventImage: "",
+    });
   };
   console.log(eventDetailCreation);
   const handleImageTrigger = () => {

@@ -15,6 +15,7 @@ import { PiVideoBold } from "react-icons/pi";
 import { InputCard } from "../_types/types";
 import useAppContext from "../_custom-hooks/useAppContext";
 import { useEffect, useRef, useState } from "react";
+
 const Navbar = () => {
   const {
     eventLocation,
@@ -100,6 +101,21 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleOnMobileSearchEventFocus);
   }, []);
 
+  const navLinks = [
+    { href: "/", label: "Find Events" },
+    { href: "/dashboard/events", label: "Create Events" },
+    { href: "/", label: "Find my tickets" },
+    { href: "/login", label: "Log In" },
+    { href: "/sign-up", label: "Sign Up" },
+  ];
+
+  const navLinkMap = navLinks.map((navLink, index) => {
+    return (
+      <Link href={navLink.href} key={index}>
+        <li className="">{navLink.label}</li>
+      </Link>
+    );
+  });
   return (
     <section className="relative">
       <div className="fixed top-0 flex items-center justify-between z-30 border-b border-gray-200 w-full md:p-4 pt-0 md:pb-0 pb-[50px] bg-white ">
@@ -223,21 +239,7 @@ const Navbar = () => {
           bg-white md:shadow-none shadow-md z-10  flex md:flex-row flex-col gap-10 md:items-center items-left  
           justify-left font-medium text-[14px] md:p-auto p-5 md:visible invisible"
         >
-          <Link href={"/"}>
-            <li className="">Find Events</li>
-          </Link>
-          <Link href={"/"}>
-            <li className="">Create Events</li>
-          </Link>
-          <Link href={"/"}>
-            <li className="">Find my tickets</li>
-          </Link>
-          <Link href={"/"}>
-            <li className="">Log In</li>
-          </Link>
-          <Link href={"/"}>
-            <li className="">Sign Up</li>
-          </Link>
+          {navLinkMap}
         </ul>
       </div>
 
