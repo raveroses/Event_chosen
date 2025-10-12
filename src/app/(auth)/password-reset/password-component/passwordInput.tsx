@@ -1,11 +1,13 @@
 "use client";
 import { DesktopLogo } from "@/app/_logo-sizes/Logo";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
+import { Spinner } from "@/components/ui/spinner";
 const PasswordInput = () => {
   const {
     authenticationDetail,
     handleSignUpOnchange,
     handlePasswordChangerInput,
+    loading
   } = useAppContext();
 
   return (
@@ -30,6 +32,11 @@ const PasswordInput = () => {
           Update Password
         </button>
       </form>
+        {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-50">
+          <Spinner className="h-10 w-10 text-primary" />
+        </div>
+      )}
     </section>
   );
 };

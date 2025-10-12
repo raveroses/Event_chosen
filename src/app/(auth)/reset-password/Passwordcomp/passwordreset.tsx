@@ -1,8 +1,9 @@
 "use client";
 import { DesktopLogo } from "@/app/_logo-sizes/Logo";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
+import { Spinner } from "@/components/ui/spinner";
 const PasswordReset = () => {
-  const { handeResetPassword, authenticationDetail, handleSignUpOnchange } =
+  const { handeResetPassword, authenticationDetail, handleSignUpOnchange,loading } =
     useAppContext();
   return (
     <section className="SignUp absolute md:top-[170px] top-[0px] md:left-[700px] bg-white md:w-[500px] w-full md:h-[500px]  h-[750px] opacity-75 md:px-[35px] px-[20px] py-[50px] z-30 ">
@@ -26,6 +27,11 @@ const PasswordReset = () => {
           update password
         </button>
       </form>
+        {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-50">
+          <Spinners className="h-10 w-10 text-primary" />
+        </div>
+      )}
     </section>
   );
 };

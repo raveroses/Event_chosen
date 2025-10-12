@@ -3,6 +3,7 @@ import { DesktopLogo } from "@/app/_logo-sizes/Logo";
 import { FaApple, FaFacebook } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
+import { Spinner } from "@/components/ui/spinner";
 const SignUpcomp = () => {
   const {
     handleGoogleSignIn,
@@ -10,6 +11,7 @@ const SignUpcomp = () => {
     handleSignUpOnchange,
     authenticationDetail,
     handleSignUpFormContinuation,
+    loading,
   } = useAppContext();
   return (
     <section className="SignUp absolute md:top-[120px] top-[0px] md:left-[700px] bg-white md:w-[500px] w-full md:h-[700px]  h-[750px] opacity-75 md:px-[35px] px-[20px] py-[50px] z-30 ">
@@ -59,6 +61,12 @@ const SignUpcomp = () => {
           <FaFacebook />
         </div>
       </div>
+
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-50">
+          <Spinner className="h-10 w-10 text-primary" />
+        </div>
+      )}
     </section>
   );
 };

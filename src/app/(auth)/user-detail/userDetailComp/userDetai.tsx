@@ -2,8 +2,9 @@
 import Link from "next/link";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
 import { DesktopLogo } from "@/app/_logo-sizes/Logo";
+import { Spinner } from "@/components/ui/spinner";
 const UserDetail = () => {
-  const { authenticationDetail, handleSignUpOnchange, signUpNewUser } =
+  const { authenticationDetail, handleSignUpOnchange, signUpNewUser, loading } =
     useAppContext();
   return (
     <section className="absolute md:top-[200px] top-[0px] md:left-[700px] bg-white md:w-[420px] w-full md:h-auto h-[750px] opacity-75 md:px-[35px] px-[20px] md:py-[50px] py-[100px] z-30 ">
@@ -48,21 +49,7 @@ const UserDetail = () => {
           className="border-2 w-full p-[12px] rounded placeholder:text-[13px] font-semibold"
           placeholder="Enter password"
         />
-        {/* 
-        <div className="flex items-center gap-[50px]">
-          <div>
-            <input type="radio" name="" id="" />
-            <label htmlFor="organizer" className="pl-1">
-              Event organizer
-            </label>
-          </div>
-          <div>
-            <input type="radio" name="" id="" />
-            <label htmlFor="organizer" className="pl-1">
-              Non-organizer
-            </label>
-          </div>
-        </div> */}
+
         <button className="w-full text-white bg-[#d1410c] p-[13px] rounded my-[5px] text-[13px] font-bold">
           Submit
         </button>
@@ -70,6 +57,11 @@ const UserDetail = () => {
           Already have an account, Login
         </Link>
       </form>
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-50">
+          <Spinner className="h-10 w-10 text-primary" />
+        </div>
+      )}
     </section>
   );
 };

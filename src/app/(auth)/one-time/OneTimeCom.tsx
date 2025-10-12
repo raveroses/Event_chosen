@@ -1,8 +1,9 @@
 "use client";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
 import { DesktopLogo } from "@/app/_logo-sizes/Logo";
+import { Spinner } from "@/components/ui/spinner";
 const OnetimeCodeCom = () => {
-  const { authenticationDetail, handleOneTime, handleSignUpOnchange } =
+  const { authenticationDetail, handleOneTime, handleSignUpOnchange, loading } =
     useAppContext();
   return (
     <section className="absolute md:top-[200px] top-[0px] md:left-[700px] bg-white md:w-[420px] w-full md:h-auto h-[750px] opacity-75 md:px-[35px] px-[20px] md:py-[50px] py-[100px] z-30 ">
@@ -30,6 +31,11 @@ const OnetimeCodeCom = () => {
           Submit
         </button>
       </form>
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-50">
+          <Spinner className="h-10 w-10 text-primary" />
+        </div>
+      )}
     </section>
   );
 };

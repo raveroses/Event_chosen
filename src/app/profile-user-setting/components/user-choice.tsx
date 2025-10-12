@@ -2,8 +2,9 @@
 import Image from "next/image";
 import { DesktopLogo } from "@/app/_logo-sizes/Logo";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
+import { Spinner } from "@/components/ui/spinner";
 const UserChoice = () => {
-  const { userChoiceList, handleUserChoice } = useAppContext();
+  const { userChoiceList, handleUserChoice, loading } = useAppContext();
 
   return (
     <section className="p-5">
@@ -56,6 +57,11 @@ const UserChoice = () => {
           </div>
         </div>
       </div>
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-50">
+          <Spinner className="h-10 w-10 text-primary" />
+        </div>
+      )}
     </section>
   );
 };

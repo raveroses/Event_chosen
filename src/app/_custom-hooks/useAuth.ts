@@ -8,7 +8,8 @@ import { UserProfile } from "../_types/types";
 import { userChoice } from "../_types/types";
 import { AuthError } from "@supabase/supabase-js";
 const localHostUrl = process.env.NEXT_PUBLIC__URL;
-const typeUser = process.env.NEXT_PUBLIC_CHOICEfUL;
+// const typeUser = process.env.NEXT_PUBLIC_CHOICEfUL;
+
 export function useAuth() {
   const [userChoiceList] = useState<userChoice[]>([
     {
@@ -24,6 +25,8 @@ export function useAuth() {
   ]);
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [isUserLoggedInBefore, setIsUserLoggedInBefore] =
+    useState<boolean>(false);
 
   const router = useRouter();
 
@@ -33,40 +36,56 @@ export function useAuth() {
   });
 
   const handleUserChoice = async (rolesChoice: string) => {
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession();
+    setLoading(true);
+    console.log("I'm clicked");
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
 
-    if (error || !session?.user) {
-      console.log("No active session:", error);
-      return;
-    }
+    try {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
 
-    console.log("Session UID:", session.user.id);
+      if (error || !session?.user) {
+        console.log("No active session:", error);
+        return;
+      }
 
-    const payload: UserProfile = {
-      email: session.user.email ?? "",
-      roles: rolesChoice.trim(),
-    };
+      console.log("Session UID:", session.user.id);
 
-    setInsertPayLoad(payload);
+      const payload: UserProfile = {
+        email: session.user.email ?? "",
+        roles: rolesChoice.trim(),
+      };
 
-    console.log("PAYLOAD:", payload);
+      setInsertPayLoad(payload);
 
-    const { data: user, error: insertError } = await supabase
-      .from("users")
-      .insert(payload)
-      .select();
+      console.log("PAYLOAD:", payload);
 
-    if (insertError) {
-      console.error("Insert error:", insertError);
-    } else {
+      const { data: user, error: insertError } = await supabase
+        .from("users")
+        .insert(payload)
+        .select();
+
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        return;
+      }
       console.log("Inserted user:", user);
       router.push("/");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Unexpected error");
+      }
+    } finally {
+      setLoading(false);
     }
   };
-
+  console.log(insertPayload);
   const [authenticationDetail, setAuthenticationDetail] =
     useState<AuthenticatedDetail>({
       signUpEmail: "",
@@ -81,34 +100,43 @@ export function useAuth() {
     setAuthenticationDetail((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSignUpFormContinuation = (
+  const handleSignUpFormContinuation = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
     setLoading(true);
+
     if (
       !isEmail.test(authenticationDetail.signUpEmail.trim()) ||
       !authenticationDetail.signUpEmail
     ) {
       toast.error("Re-check all fields");
+      setLoading(false);
       return;
     }
+
+    await new Promise((r) => setTimeout(r, 1000));
     router.push("/user-detail");
     setLoading(false);
   };
 
+  console.log(loading);
+
   const signUpNewUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (
-      !authenticationDetail.firstName.trim() ||
-      !authenticationDetail.lastName.trim() ||
-      !authenticationDetail.password.trim() ||
-      !isEmail.test(authenticationDetail.signUpEmail.trim())
-    ) {
-      toast.error("Re-check all fields");
-      return;
-    } else {
-      const { data, error } = await supabase.auth.signUp({
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 1000));
+    try {
+      if (
+        !authenticationDetail.firstName.trim() ||
+        !authenticationDetail.lastName.trim() ||
+        !authenticationDetail.password.trim() ||
+        !isEmail.test(authenticationDetail.signUpEmail.trim())
+      ) {
+        toast.error("Re-check all fields");
+        return;
+      }
+      const { data } = await supabase.auth.signUp({
         email: authenticationDetail.signUpEmail.trim(),
         password: authenticationDetail.password.trim(),
         options: {
@@ -125,7 +153,14 @@ export function useAuth() {
       } else {
         router.push("/sign-up");
       }
-      // console.log("SIGN UP =>", data.session, error);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        toast.error(e.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
     }
 
     setAuthenticationDetail({
@@ -138,55 +173,125 @@ export function useAuth() {
 
   const signInWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (
-      !authenticationDetail.password.trim() ||
-      !isEmail.test(authenticationDetail.signUpEmail.trim())
-    ) {
-      toast.error("Re-check all fields");
-      return;
-    } else {
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 1000));
+
+    try {
+      if (
+        !authenticationDetail.password.trim() ||
+        !isEmail.test(authenticationDetail.signUpEmail.trim())
+      ) {
+        toast.error("Re-check all fields");
+        return;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: authenticationDetail.signUpEmail.trim(),
         password: authenticationDetail.password,
       });
 
       if (!data.session) {
-        // console.log(error);
         toast.error(error?.message);
         router.push("/login");
         return;
-      } else {
-        router.push("/profile-user-setting");
       }
+
+      const { data: userTableFetching, error: userTableFetchingError } =
+        await supabase.from("users").select("*");
+
+      const {
+        data: { session },
+        error: userSessionError,
+      } = await supabase.auth.getSession();
+
+      if (userSessionError || !session?.user) {
+        console.log("No active session:", userSessionError);
+        return;
+      }
+
+      console.log("Session UID:", session.user.id);
+
+      const isExistedUser = userTableFetching?.find((userDetail) => {
+        return (
+          userDetail.id === session.user.id &&
+          userDetail.email === session.user.email
+        );
+      });
+
+      if (!isExistedUser) {
+        router.push("/profile-user-setting");
+      } else {
+        router.push("/");
+      }
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        toast.error(e.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: typeUser,
-      },
+    setLoading(true);
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
     });
+    try {
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        toast.error(e.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFacebook = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "facebook",
-      options: {
-        redirectTo: typeUser,
-      },
+    setLoading(true);
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
     });
+    try {
+      await supabase.auth.signInWithOAuth({
+        provider: "facebook",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        toast.error(e.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOneTime = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
     try {
       const { data, error } = await supabase.auth.signInWithOtp({
         email: authenticationDetail.signUpEmail,
         options: {
           shouldCreateUser: true,
-          emailRedirectTo: typeUser,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
@@ -198,7 +303,13 @@ export function useAuth() {
         }
       }
     } catch (e: unknown) {
-      console.log((e as Error).message);
+      if (e instanceof Error) {
+        toast.error(e.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
     }
 
     setAuthenticationDetail({
@@ -211,6 +322,9 @@ export function useAuth() {
 
   const handeResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
     await supabase.auth.resetPasswordForEmail(
       authenticationDetail.signUpEmail,
       {
@@ -229,16 +343,37 @@ export function useAuth() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    if (!authenticationDetail.password.trim()) {
-      toast.error("Re-check all fields");
+    setLoading(true);
 
-      return;
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+
+    try {
+      if (!authenticationDetail.password.trim()) {
+        toast.error("Re-check all fields");
+
+        return;
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: authenticationDetail.password.trim(),
+      });
+
+      if (error) throw error;
+
+      toast.success("Password updated successfully");
+      router.push("/login");
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        toast.error(e.message);
+      } else {
+        toast.error("Unexpected Error");
+      }
+    } finally {
+      setLoading(false);
     }
 
-    await supabase.auth.updateUser({
-      password: authenticationDetail.password.trim(),
-    });
-    router.push("/login");
     setAuthenticationDetail({
       signUpEmail: "",
       firstName: "",
@@ -248,6 +383,8 @@ export function useAuth() {
   };
 
   useEffect(() => {
+    let subscription: { unsubscribe: () => void } | null = null;
+
     const handleRouteProtection = async () => {
       const { data, error } = await supabase.auth.getSession();
       if (!data.session) {
@@ -255,23 +392,59 @@ export function useAuth() {
         return;
       }
 
-      console.log(error);
+      const { data: sub } = supabase.auth.onAuthStateChange(
+        (event, session) => {
+          if (!session) {
+            router.push("/sign-up");
+          }
+        }
+      );
+
+      subscription = sub.subscription;
     };
 
     handleRouteProtection();
 
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (!session) {
-          router.push("/sign-up");
-        }
-      }
-    );
-
     return () => {
-      subscription?.subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, [router]);
+
+  // useEffect(() => {
+  //   let subscription: { unsubscribe: () => void } | null = null;
+
+  //   const handleIsLogin = async () => {
+  //     const { data, error } = await supabase.auth.getSession();
+  //     if (!data.session) {
+  //       router.push("/sign-up");
+  //       return;
+  //     }
+
+  //     router.push("/");
+
+  //     const { data: sub } = supabase.auth.onAuthStateChange(
+  //       (event, session) => {
+  //         if (!session) {
+  //           router.push("/sign-up");
+  //         }
+
+  //         //  else {
+  //         //   // router.push("/");
+  //         // }
+  //       }
+  //     );
+
+  //     subscription = sub.subscription;
+  //   };
+
+  //   handleIsLogin();
+
+  //   return () => {
+  //     subscription?.unsubscribe();
+  //   };
+  // }, []);
+
+  console.log(isUserLoggedInBefore);
 
   return {
     authenticationDetail,
@@ -286,5 +459,6 @@ export function useAuth() {
     handlePasswordChangerInput,
     userChoiceList,
     handleUserChoice,
+    loading,
   };
 }

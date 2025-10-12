@@ -54,7 +54,9 @@ export type Context = {
   handleFacebook: () => Promise<void>;
   handleSignUpOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
   authenticationDetail: AuthenticatedDetail;
-  handleSignUpFormContinuation: (e: FormEvent<HTMLFormElement>) => void;
+  handleSignUpFormContinuation: (
+    e: FormEvent<HTMLFormElement>
+  ) => Promise<void>;
   signUpNewUser: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   signInWithEmail: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   handleOneTime: (e: FormEvent<HTMLFormElement>) => Promise<void>;
@@ -62,6 +64,7 @@ export type Context = {
   handlePasswordChangerInput: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   userChoiceList: userChoice[];
   handleUserChoice: (id: string) => Promise<void>;
+  loading: boolean;
 };
 
 export type InputCard = {
