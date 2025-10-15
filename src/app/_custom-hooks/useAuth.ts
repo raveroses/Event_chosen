@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { AuthenticatedDetail } from "../_types/types";
@@ -7,6 +7,7 @@ import supabase from "../_supabase/ceateclient";
 import { UserProfile } from "../_types/types";
 import { userChoice } from "../_types/types";
 import { AuthError } from "@supabase/supabase-js";
+import { error } from "console";
 const localHostUrl = process.env.NEXT_PUBLIC__URL;
 // const typeUser = process.env.NEXT_PUBLIC_CHOICEfUL;
 
@@ -25,8 +26,8 @@ export function useAuth() {
   ]);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [isUserLoggedInBefore, setIsUserLoggedInBefore] =
-    useState<boolean>(false);
+  // const [isUserLoggedInBefore, setIsUserLoggedInBefore] =
+  //   useState<boolean>(false);
 
   const router = useRouter();
 
@@ -35,57 +36,6 @@ export function useAuth() {
     roles: "",
   });
 
-  const handleUserChoice = async (rolesChoice: string) => {
-    setLoading(true);
-    console.log("I'm clicked");
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1000);
-    });
-
-    try {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-
-      if (error || !session?.user) {
-        console.log("No active session:", error);
-        return;
-      }
-
-      console.log("Session UID:", session.user.id);
-
-      const payload: UserProfile = {
-        email: session.user.email ?? "",
-        roles: rolesChoice.trim(),
-      };
-
-      setInsertPayLoad(payload);
-
-      console.log("PAYLOAD:", payload);
-
-      const { data: user, error: insertError } = await supabase
-        .from("users")
-        .insert(payload)
-        .select();
-
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        return;
-      }
-      console.log("Inserted user:", user);
-      router.push("/");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Unexpected error");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-  console.log(insertPayload);
   const [authenticationDetail, setAuthenticationDetail] =
     useState<AuthenticatedDetail>({
       signUpEmail: "",
@@ -120,7 +70,6 @@ export function useAuth() {
     setLoading(false);
   };
 
-  console.log(loading);
 
   const signUpNewUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -170,6 +119,8 @@ export function useAuth() {
       password: "",
     });
   };
+
+  const [displayBecomeAuser, setDisplayBecomeAuser] = useState<boolean>(false);
 
   const signInWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -228,6 +179,56 @@ export function useAuth() {
         toast.error(e.message);
       } else {
         toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUserChoice = async (rolesChoice: string) => {
+    setLoading(true);
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+
+    try {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error || !session?.user) {
+        console.log("No active session:", error);
+        return;
+      }
+
+      console.log("Session UID:", session.user.id);
+
+      const payload: UserProfile = {
+        email: session.user.email ?? "",
+        roles: rolesChoice.trim(),
+      };
+
+      setInsertPayLoad(payload);
+
+      console.log("PAYLOAD:", payload);
+
+      const { data: user, error: insertError } = await supabase
+        .from("users")
+        .insert(payload)
+        .select();
+
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        return;
+      }
+      console.log("Inserted user:", user);
+      router.push("/");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Unexpected error");
       }
     } finally {
       setLoading(false);
@@ -410,6 +411,35 @@ export function useAuth() {
     };
   }, [router]);
 
+  useEffect(() => {
+    const becomingOrganizerChecker = async () => {
+      const { data: userTableFetching, error: userTableFetchingError } =
+        await supabase.from("users").select("*");
+
+      const {
+        data: { session },
+        error: userSessionError,
+      } = await supabase.auth.getSession();
+
+      if (userSessionError || !session?.user) {
+        console.log("No active session:", userSessionError);
+        return;
+      }
+
+      const checkUserRole = userTableFetching?.find((userDetail) => {
+        return (
+          userDetail.roles === "attendee" &&
+          userDetail.email === session.user.email
+        );
+      });
+      if (checkUserRole) {
+        setDisplayBecomeAuser(true);
+      }
+    };
+
+    becomingOrganizerChecker();
+  });
+
   // useEffect(() => {
   //   let subscription: { unsubscribe: () => void } | null = null;
 
@@ -444,7 +474,39 @@ export function useAuth() {
   //   };
   // }, []);
 
-  console.log(isUserLoggedInBefore);
+  // console.log(isUserLoggedInBefore);
+
+  const [isBecomingOrganizer, setIsBecomingOrganizer] =
+    useState<boolean>(false);
+
+  const handleBecomeOrganizerOnchange = (e: ChangeEvent<HTMLInputElement>) => {
+    setIsBecomingOrganizer(e.target.checked);
+  };
+
+  useEffect(() => {
+    const attendeeBecomingOrganizer = async () => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session?.user) {
+        return;
+      }
+
+      if (isBecomingOrganizer) {
+        const { error } = await supabase
+          .from("users")
+          .update({ roles: "organizer" })
+          .eq("id", session.session.user.id);
+        console.log(error);
+      } else {
+        const { error } = await supabase
+          .from("users")
+          .update({ roles: "attendee" })
+          .eq("id", session.session.user.id);
+        console.log(error);
+      }
+    };
+
+    attendeeBecomingOrganizer();
+  }, [isBecomingOrganizer]);
 
   return {
     authenticationDetail,
@@ -460,5 +522,8 @@ export function useAuth() {
     userChoiceList,
     handleUserChoice,
     loading,
+    displayBecomeAuser,
+    isBecomingOrganizer,
+    handleBecomeOrganizerOnchange,
   };
 }

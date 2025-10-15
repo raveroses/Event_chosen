@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import supabase from "../_supabase/ceateclient";
 import { Event } from "../_types/types";
 import { toast } from "react-toastify";
@@ -23,7 +23,9 @@ export function useEventCreation() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const imageRef = useRef<HTMLInputElement | null>(null);
   const [selectImageFile, setSelectImageFile] = useState<File | null>(null);
-
+  const [eachUserEventCreationList, setEachUserEventCreationList] = useState<
+    Event[]
+  >([]);
   const dateOnSelect = (date: Date) => {
     setDate(date);
     setOpen(false);
@@ -124,11 +126,44 @@ export function useEventCreation() {
       eventImage: "",
     });
   };
-  console.log(eventDetailCreation);
+
   const handleImageTrigger = () => {
     imageRef.current?.click();
   };
 
+  useEffect(() => {
+    const handleUserEventList = async () => {
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session.session?.user) {
+          console.log("No user session found");
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from("eventchosen_duplicate")
+          .select("*");
+        if (error) {
+          console.error("Error fetching users:", error);
+          return;
+        }
+        console.log("Fetched data:", data);
+        const allListedByIdUser = data?.filter(
+          (event) => event.user_id === session?.session?.user.id
+        );
+
+        
+        if (allListedByIdUser) {
+          setEachUserEventCreationList(allListedByIdUser);
+        }
+      } catch (err) {
+        console.error("Unexpected error:", err);
+      }
+    };
+
+    handleUserEventList();
+  }, []);
+  console.log(eachUserEventCreationList)
   return {
     eventDetailCreation,
     handleEventCreationOnchange,
@@ -144,5 +179,6 @@ export function useEventCreation() {
     handleImageTrigger,
     imageRef,
     previewImage,
+    eachUserEventCreationList,
   };
 }

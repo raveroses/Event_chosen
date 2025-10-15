@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Event, Search } from "../_types/types";
-import {  toast } from "react-toastify";
+import { toast } from "react-toastify";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_API_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export function useEventData() {
-  const [eventData, setEventData] = useState<Event[]>([]);
+  // const [eventData, setEventData] = useState<Event[]>([]);
   const [searchFocus, setSearchFocus] = useState<Search>({
     searchValue: "",
     locationSearch: "",
@@ -19,18 +19,29 @@ export function useEventData() {
   const [eventFilter, setEventFilter] = useState<Event[]>([]);
   const [eventInputSearch, setEventInputSearch] = useState<Event[]>([]);
   const [eventDays, setEventDays] = useState<string>("");
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
 
   useEffect(() => {
     const fetchingEvent = async () => {
       try {
-        const { data, error } = await supabase.from("eventchosen").select("*");
+        const { data, error } = await supabase
+          .from("eventchosen_duplicate")
+          .select("*");
+
+        const { data: eventDefault, error: eventDefaultError } = await supabase
+          .from("eventchosen")
+          .select("*");
+
+        console.log(eventDefaultError);
         if (error) {
           console.error("Supabase fetch error:", error.message);
-          toast.error(error.message)
+          toast.error(error.message);
           return;
         }
-        console.log(data);
-        setEventData(data);
+
+        if (eventDefault && data) {
+          setAllEvents([...data, ...eventDefault]);
+        }
       } catch (e) {
         console.log(e);
       }
@@ -40,7 +51,8 @@ export function useEventData() {
 
   const handleAllClick = (eventDay: string) => {
     if (eventDay === "All") {
-      setEventFilter(eventData);
+      // setEventFilter(eventData);
+      setEventFilter([...allEvents]);
     } else {
       setEventFilter([]);
     }
@@ -60,6 +72,7 @@ export function useEventData() {
       const updatedHistory = Array.from(
         new Set([...prev.searchHistory, prev.searchValue.trim()])
       );
+      console.log("Updated", updatedHistory);
       return {
         ...prev,
         searchHistory: updatedHistory,
@@ -73,7 +86,7 @@ export function useEventData() {
   ) => {
     if (!event || event.key === "Enter") {
       handleSearchValidation();
-      const searchfiltering = eventData.filter((event) => {
+      const searchfiltering = allEvents.filter((event) => {
         return (
           event.eventTitle.trim().toLowerCase() ===
           searchFocus.searchValue.trim().toLowerCase()
@@ -84,7 +97,7 @@ export function useEventData() {
       setEventInputSearch(searchfiltering);
     }
   };
-
+console.log(searchFocus.searchValue)
   const handleClear = () => {
     setSearchFocus((prev) => ({ ...prev, searchHistory: [], searchValue: "" }));
   };
@@ -120,7 +133,7 @@ export function useEventData() {
     ) {
       setEventFilter([]);
     } else {
-      const filtered = eventData.filter((event) => {
+      const filtered = allEvents.filter((event) => {
         return (
           event.eventLocationsCreate.trim().toLowerCase() ===
           eventLocation.trim().toLowerCase()
@@ -131,10 +144,10 @@ export function useEventData() {
       }
       setEventFilter(filtered);
     }
-  }, [eventLocation, eventData, searchFocus.searchValue, eventInputSearch]);
+  }, [eventLocation, allEvents, searchFocus.searchValue, eventInputSearch]);
 
   return {
-    eventData,
+    // eventData,
     eventLocation,
     handleEventLocation,
     handleClear,
@@ -149,5 +162,6 @@ export function useEventData() {
     eventInputSearch,
     handleAllClick,
     eventDays,
+    allEvents,
   };
 }

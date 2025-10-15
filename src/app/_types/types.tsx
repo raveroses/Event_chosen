@@ -23,7 +23,7 @@ export type Context = {
   handleEventLocation: (location: string) => void;
   eventLocation: string;
   searchFocus: Search;
-  eventData: Event[];
+  // eventData: Event[];
   eventFilter: Event[];
   eventInputSearch: Event[];
   handleAllClick: (eventDay: string) => void;
@@ -65,6 +65,11 @@ export type Context = {
   userChoiceList: userChoice[];
   handleUserChoice: (id: string) => Promise<void>;
   loading: boolean;
+  allEvents: Event[];
+  displayBecomeAuser: boolean;
+  handleBecomeOrganizerOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
+  isBecomingOrganizer: boolean;
+  eachUserEventCreationList: Event[];
 };
 
 export type InputCard = {

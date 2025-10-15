@@ -4,16 +4,19 @@ import { MdCalendarMonth } from "react-icons/md";
 import Image from "next/image";
 import { useState } from "react";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
+const supabaseLoader = ({ src }: { src: string }) => {
+  return src;
+};
 
 const LocationSearching = () => {
   const [eventSchedule] = useState<string[]>(["All", "Today", "This weekend"]);
   const {
-    eventData,
     eventDays,
     eventFilter,
     eventInputSearch,
     eventLocation,
     handleAllClick,
+    allEvents,
   } = useAppContext();
 
   return (
@@ -67,15 +70,17 @@ const LocationSearching = () => {
               return (
                 <div
                   className={`card-cover hover:shadow-lg transition-all duration-200 cursor-pointer md:w-[300px] w-full h-auto pb-[10px] rounded-xl ${
-                    eventData.length > 0 ? "block" : "hidden"
+                    allEvents.length > 0 ? "block" : "hidden"
                   }`}
                   key={index}
                 >
                   <div className="relative md:w-[300px] md:h-[180px] w-full h-[200px] min-w-full">
                     <Image
+                      loader={supabaseLoader}
                       alt="card-image"
                       fill={true}
                       src={`${event.eventImage}`}
+                      unoptimized
                       className=" object-cover object-center rounded-t-2xl"
                     />
                   </div>

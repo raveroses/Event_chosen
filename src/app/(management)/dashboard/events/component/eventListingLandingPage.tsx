@@ -6,6 +6,12 @@ import { PiCaretDownBold } from "react-icons/pi";
 import { BiCalendarAlt } from "react-icons/bi";
 import Overlay from "./Overlay";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
+import Image from "next/image";
+
+const supabaseLoader = ({ src }: { src: string }) => {
+  return src;
+};
+
 const EventListingLandingPage = () => {
   const [createList] = useState<
     {
@@ -27,7 +33,8 @@ const EventListingLandingPage = () => {
     },
   ]);
 
-  const { handleEventCreationPlus } = useAppContext();
+  const { handleEventCreationPlus, eachUserEventCreationList } =
+    useAppContext();
   return (
     <>
       <h1 className="text-[40px] font-bold">Events</h1>
@@ -71,13 +78,54 @@ const EventListingLandingPage = () => {
         </button>
       </div>
 
-      <div className="flex flex-col items-center justify-center h-[300px]">
-        <div className="text-[80px] text-gray-400 bg-gray-300 rounded-full p-5">
-          <BiCalendarAlt />
-        </div>
-        <h3 className="pt-[20px] text-gray-400">No events to show</h3>
-      </div>
+      {eachUserEventCreationList.length > 0 ? (
+        <div className=" grid md:grid-cols-4 grid-col-1 md:gap-[90px] gap-[30px] py-[50px]">
+          {eachUserEventCreationList.map((event, index) => {
+            return (
+              <div
+                className={`card-cover hover:shadow-lg transition-all duration-200 cursor-pointer md:w-[300px] w-full h-auto pb-[10px] rounded-xl ${
+                  eachUserEventCreationList.length > 0 ? "block" : "hidden"
+                }`}
+                key={index}
+              >
+                <div className="relative md:w-[300px] md:h-[180px] w-full h-[200px] min-w-full">
+                  <Image
+                    loader={supabaseLoader}
+                    alt="card-image"
+                    fill={true}
+                    src={`${event.eventImage}`}
+                    unoptimized
+                    className=" object-cover object-center rounded-t-2xl"
+                  />
+                </div>
 
+                <div className="text-gray-600 flex flex-col gap-[4px] px-2 py-1">
+                  <h3 className="py-1 md:text-[15px] text-[18px] font-semibold ">
+                    {event.eventTitle}
+                  </h3>
+                  <div className="timeandDate md:text-[12px] text-[16px] md:font-semibold font-medium">
+                    <span className="day"> {event.eventDate}</span>
+                    <span> {event.eventDate}</span>
+                    <span> {event.eventStartTime} AMs</span>
+                  </div>
+                  <p className="text-[14px]">{event.eventOverview}</p>
+
+                  <h3 className="md:text-[13px] text-[14px] font-semibold">
+                    {event.eventCategory}
+                  </h3>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-[300px]">
+          <div className="text-[80px] text-gray-400 bg-gray-300 rounded-full p-5">
+            <BiCalendarAlt />
+          </div>
+          <h3 className="pt-[20px] text-gray-400">No events to show</h3>
+        </div>
+      )}
       <div
         className="plusCreate absolute bg-[#9f2c15] rounded-full p-5 shadow shadow-[#9f2c15] text-semibold text-white inline right-0 bottom-0 md:hidden"
         onClick={handleEventCreationPlus}

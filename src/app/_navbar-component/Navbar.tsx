@@ -28,6 +28,9 @@ const Navbar = () => {
     handleSearchEventBlur,
     handleSearchLocationFocus,
     handleSearchLocationBlur,
+    displayBecomeAuser,
+    isBecomingOrganizer,
+    handleBecomeOrganizerOnchange,
   } = useAppContext();
 
   const [inputCard] = useState<InputCard[]>([
@@ -147,7 +150,9 @@ const Navbar = () => {
             </div>
 
             <div
-              className={`absolute top-20  left-[350px] 
+              className={`absolute top-20  ${
+                displayBecomeAuser ? "left:[350px]" : "left-[390px]"
+              }
                  w-[340px] p-5  rounded-xl z-30 bg-white       
                ${searchFocus.isSearchEventFocus ? "md:block hidden" : "hidden"}
                  `}
@@ -212,7 +217,9 @@ const Navbar = () => {
         <div
           className={`${
             searchFocus.isSearchLocationFocus ? "md:block hidden" : "hidden"
-          }  absolute top-20 left-[740px] bg-white w-[350px]
+          }  absolute top-20 ${
+            displayBecomeAuser ? "left-[580px]" : "left-[727px]"
+          }  bg-white w-[350px]
            h-[150px] p-5 rounded shadow`}
         >
           <div className={`card flex flex-col gap-[20px]  `}>
@@ -241,6 +248,18 @@ const Navbar = () => {
         >
           {navLinkMap}
         </ul>
+
+        {displayBecomeAuser && (
+          <form className="flex gap-2">
+            <input
+              type="checkbox"
+              value="organizer"
+              onChange={handleBecomeOrganizerOnchange}
+              checked={isBecomingOrganizer}
+            />
+            <label htmlFor="organizer">Become an organizer</label>
+          </form>
+        )}
       </div>
 
       <div
