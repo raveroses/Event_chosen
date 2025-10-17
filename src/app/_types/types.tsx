@@ -70,6 +70,10 @@ export type Context = {
   handleBecomeOrganizerOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
   isBecomingOrganizer: boolean;
   eachUserEventCreationList: Event[];
+  handleSeachOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
+  allListUserEventValue: string;
+  handleUserEventListSearch: () => Promise<void>;
+  filteringEvent: Event[];
 };
 
 export type InputCard = {
