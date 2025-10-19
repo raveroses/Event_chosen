@@ -28,7 +28,7 @@ const Navbar = () => {
     handleSearchEventBlur,
     handleSearchLocationFocus,
     handleSearchLocationBlur,
-    displayBecomeAuser,
+    // displayBecomeAuser,
     isBecomingOrganizer,
     handleBecomeOrganizerOnchange,
   } = useAppContext();
@@ -151,7 +151,7 @@ const Navbar = () => {
 
             <div
               className={`absolute top-20  ${
-                displayBecomeAuser ? "left:[350px]" : "left-[390px]"
+                !isBecomingOrganizer ? "left:[350px]" : "left-[390px]"
               }
                  w-[340px] p-5  rounded-xl z-30 bg-white       
                ${searchFocus.isSearchEventFocus ? "md:block hidden" : "hidden"}
@@ -218,7 +218,7 @@ const Navbar = () => {
           className={`${
             searchFocus.isSearchLocationFocus ? "md:block hidden" : "hidden"
           }  absolute top-20 ${
-            displayBecomeAuser ? "left-[580px]" : "left-[727px]"
+            !isBecomingOrganizer ? "left-[580px]" : "left-[727px]"
           }  bg-white w-[350px]
            h-[150px] p-5 rounded shadow`}
         >
@@ -249,7 +249,7 @@ const Navbar = () => {
           {navLinkMap}
         </ul>
 
-        {displayBecomeAuser && (
+        {!isBecomingOrganizer && (
           <form className="flex gap-2">
             <input
               type="checkbox"

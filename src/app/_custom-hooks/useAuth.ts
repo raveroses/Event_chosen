@@ -70,7 +70,6 @@ export function useAuth() {
     setLoading(false);
   };
 
-
   const signUpNewUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -120,7 +119,6 @@ export function useAuth() {
     });
   };
 
-  const [displayBecomeAuser, setDisplayBecomeAuser] = useState<boolean>(false);
 
   const signInWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -411,71 +409,6 @@ export function useAuth() {
     };
   }, [router]);
 
-  useEffect(() => {
-    const becomingOrganizerChecker = async () => {
-      const { data: userTableFetching, error: userTableFetchingError } =
-        await supabase.from("users").select("*");
-
-      const {
-        data: { session },
-        error: userSessionError,
-      } = await supabase.auth.getSession();
-
-      if (userSessionError || !session?.user) {
-        console.log("No active session:", userSessionError);
-        return;
-      }
-
-      const checkUserRole = userTableFetching?.find((userDetail) => {
-        return (
-          userDetail.roles === "attendee" &&
-          userDetail.email === session.user.email
-        );
-      });
-      if (checkUserRole) {
-        setDisplayBecomeAuser(true);
-      }
-    };
-
-    becomingOrganizerChecker();
-  });
-
-  // useEffect(() => {
-  //   let subscription: { unsubscribe: () => void } | null = null;
-
-  //   const handleIsLogin = async () => {
-  //     const { data, error } = await supabase.auth.getSession();
-  //     if (!data.session) {
-  //       router.push("/sign-up");
-  //       return;
-  //     }
-
-  //     router.push("/");
-
-  //     const { data: sub } = supabase.auth.onAuthStateChange(
-  //       (event, session) => {
-  //         if (!session) {
-  //           router.push("/sign-up");
-  //         }
-
-  //         //  else {
-  //         //   // router.push("/");
-  //         // }
-  //       }
-  //     );
-
-  //     subscription = sub.subscription;
-  //   };
-
-  //   handleIsLogin();
-
-  //   return () => {
-  //     subscription?.unsubscribe();
-  //   };
-  // }, []);
-
-  // console.log(isUserLoggedInBefore);
-
   const [isBecomingOrganizer, setIsBecomingOrganizer] =
     useState<boolean>(false);
 
@@ -484,30 +417,50 @@ export function useAuth() {
   };
 
   useEffect(() => {
-    const attendeeBecomingOrganizer = async () => {
+    const fetchUserRole = async () => {
       const { data: session } = await supabase.auth.getSession();
-      if (!session.session?.user) {
+      const user = session.session?.user;
+      if (!user) return;
+
+      const { data: userData, error } = await supabase
+        .from("users")
+        .select("roles")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching user role:", error);
         return;
       }
 
-      if (isBecomingOrganizer) {
-        const { error } = await supabase
-          .from("users")
-          .update({ roles: "organizer" })
-          .eq("id", session.session.user.id);
-        console.log(error);
+      setIsBecomingOrganizer(userData?.roles === "organizer");
+    };
+
+    fetchUserRole();
+  }, []);
+
+  useEffect(() => {
+    const updateUserRole = async () => {
+      const { data: session } = await supabase.auth.getSession();
+      const user = session.session?.user;
+      if (!user) return;
+
+      const newRole = isBecomingOrganizer ? "organizer" : "attendee";
+
+      const { error } = await supabase
+        .from("users")
+        .update({ roles: newRole })
+        .eq("id", user.id);
+
+      if (error) {
+        console.error("Error updating user role:", error);
       } else {
-        const { error } = await supabase
-          .from("users")
-          .update({ roles: "attendee" })
-          .eq("id", session.session.user.id);
-        console.log(error);
+        console.log(`User role updated to ${newRole}`);
       }
     };
 
-    attendeeBecomingOrganizer();
+    updateUserRole();
   }, [isBecomingOrganizer]);
-
   return {
     authenticationDetail,
     handleSignUpOnchange,
@@ -522,7 +475,7 @@ export function useAuth() {
     userChoiceList,
     handleUserChoice,
     loading,
-    displayBecomeAuser,
+    // displayBecomeAuser,
     isBecomingOrganizer,
     handleBecomeOrganizerOnchange,
   };

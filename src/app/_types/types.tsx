@@ -66,7 +66,7 @@ export type Context = {
   handleUserChoice: (id: string) => Promise<void>;
   loading: boolean;
   allEvents: Event[];
-  displayBecomeAuser: boolean;
+  // displayBecomeAuser: boolean;
   handleBecomeOrganizerOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
   isBecomingOrganizer: boolean;
   eachUserEventCreationList: Event[];
@@ -113,3 +113,39 @@ export type UserProfile = {
 //   eventLocationsCreate: string;
 //   eventOverview: string;
 // };
+
+// useEffect(() => {
+//   const becomingOrganizerChecker = async () => {
+//     try {
+//       const {
+//         data: { session },
+//         error: userSessionError,
+//       } = await supabase.auth.getSession();
+
+//       const { data: userTableFetching, error: userTableFetchingError } =
+//         await supabase
+//           .from("users")
+//           .select("roles")
+//           .eq("id", session?.user.id)
+//           .single();
+
+//       if (userTableFetchingError) {
+//         console.log("Error fetching user:", userTableFetchingError);
+//       }
+//       if (userSessionError || !session?.user) {
+//         console.log("No active session:", userSessionError);
+//         return;
+//       }
+
+//       if (userTableFetching?.roles === "attendee" && session.user.email) {
+//         setDisplayBecomeAuser(true);
+//       }
+//     } catch (e: unknown) {
+//       if (e instanceof Error) {
+//         console.log(e.message);
+//       }
+//     }
+//   };
+
+//   becomingOrganizerChecker();
+// }, [displayBecomeAuser]);
