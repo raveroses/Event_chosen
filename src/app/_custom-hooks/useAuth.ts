@@ -119,7 +119,6 @@ export function useAuth() {
     });
   };
 
-
   const signInWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -409,35 +408,67 @@ export function useAuth() {
     };
   }, [router]);
 
-  const [isBecomingOrganizer, setIsBecomingOrganizer] =
-    useState<boolean>(false);
+  const [isBecomingOrganizer, setIsBecomingOrganizer] = useState<boolean>(
+    () => {
+      if (typeof window === "undefined") return false;
 
+      try {
+        const stored = localStorage.getItem("isBecomingOrganizerBoolean");
+        return stored === "true";
+      } catch (error) {
+        console.error("Failed to read from localStorage:", error);
+        return false;
+      }
+    }
+  );
   const handleBecomeOrganizerOnchange = (e: ChangeEvent<HTMLInputElement>) => {
     setIsBecomingOrganizer(e.target.checked);
   };
 
   useEffect(() => {
     const fetchUserRole = async () => {
-      const { data: session } = await supabase.auth.getSession();
-      const user = session.session?.user;
-      if (!user) return;
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        const user = session.session?.user;
+        if (!user) return;
 
-      const { data: userData, error } = await supabase
-        .from("users")
-        .select("roles")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching user role:", error);
-        return;
+        const { data: userData, error } = await supabase
+          .from("users")
+          .select("roles")
+          .eq("id", user.id)
+          .single();
+        console.log("userData", userData);
+        if (error) {
+          console.error("Error fetching user role:", error);
+          return;
+        }
+        const isUserRole = userData?.roles === "organizer";
+        console.log("isUSEROLE", isUserRole);
+        if (isUserRole) {
+          setIsBecomingOrganizer(isUserRole);
+          localStorage.setItem(
+            "isBecomingOrganizerBoolean",
+            String(isUserRole)
+          );
+        } else {
+          setIsBecomingOrganizer(false);
+        }
+        // if (isBecomingOrganizer !== isUserRole) {
+        //   setIsBecomingOrganizer(isUserRole);
+        //   localStorage.setItem(
+        //     "isBecomingOrganizerBoolean",
+        //     String(isUserRole)
+        //   );
+        // }
+      } catch (e) {
+        console.log(e);
       }
-
-      setIsBecomingOrganizer(userData?.roles === "organizer");
     };
 
     fetchUserRole();
   }, []);
+
+  console.log("isbecoming organizer", isBecomingOrganizer);
 
   useEffect(() => {
     const updateUserRole = async () => {

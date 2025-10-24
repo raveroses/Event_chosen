@@ -1,4 +1,11 @@
-import { ChangeEvent, FormEvent, KeyboardEvent, ReactNode } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  FormEvent,
+  KeyboardEvent,
+  ReactNode,
+  SetStateAction,
+} from "react";
 
 export type Event = {
   eventCategory: string;
@@ -74,6 +81,9 @@ export type Context = {
   allListUserEventValue: string;
   handleUserEventListSearch: () => Promise<void>;
   filteringEvent: Event[];
+  dateSetter: Date | undefined;
+  setDateSetter: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  handleUserEventList: () => Promise<void>;
 };
 
 export type InputCard = {

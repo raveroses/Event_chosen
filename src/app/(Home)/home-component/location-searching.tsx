@@ -90,9 +90,14 @@ const LocationSearching = () => {
                       {event.eventTitle}
                     </h3>
                     <div className="timeandDate md:text-[12px] text-[16px] md:font-semibold font-medium">
-                      <span className="day"> {event.eventDate}</span>
-                      <span> {event.eventDate}</span>
-                      <span> {event.eventStartTime} AMs</span>
+                      <span className="day">
+                        Date: <span className="pl-3">{event.eventDate}</span>
+                      </span>
+                      <div className="flex gap-[10px]">
+                        Time:
+                        <span className="pl-1"> {event.eventStartTime} </span>
+                        <span>AM</span>
+                      </div>
                     </div>
                     <p className="text-[14px]">{event.eventOverview}</p>
 

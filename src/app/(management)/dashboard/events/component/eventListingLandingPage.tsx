@@ -1,5 +1,5 @@
 "use client";
-import { ChangeEvent, ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { FaList, FaPlus, FaRegCalendar } from "react-icons/fa6";
 import { PiCaretDownBold } from "react-icons/pi";
@@ -8,7 +8,7 @@ import Overlay from "./Overlay";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
 import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
-
+import CalendarPage from "./calendarPage";
 const supabaseLoader = ({ src }: { src: string }) => {
   return src;
 };
@@ -46,11 +46,33 @@ const EventListingLandingPage = () => {
     filteringEvent,
     handleUserEventListSearch,
     loading,
+    handleUserEventList,
   } = useAppContext();
 
-  console.log(filteringEvent);
+  console.log("FILTERING EVENT", filteringEvent);
+
+  const [isCalendarClose, setIsCalendarClose] = useState<boolean>(false);
+  const handleIsOpenCalendar = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setIsCalendarClose(true);
+  };
+
+  const calendarRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(e.target as Node)
+      ) {
+        setIsCalendarClose(false);
+      }
+    };
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, []);
+
   return (
-    <>
+    <div className="relative">
       <h1 className="text-[40px] font-bold">Events</h1>
       <p className="text-[#365ee4] font-bold pt-5">Events</p>
 
@@ -79,9 +101,17 @@ const EventListingLandingPage = () => {
                   className={`bg-[#365ee4] md:w-[120px] w-[250px] md:gap-[10px] md:justify-center justify-between px-[10px] text-white rounded-3xl  py-[10px] items-center cursor-pointer ${
                     item.list !== "All events" ? "hidden md:flex" : "flex"
                   }`}
-                  onClick={() => {
+                  onClick={(e) => {
                     if (item.list === "Search") {
                       handleUserEventListSearch();
+                    }
+
+                    if (item.list === "Calendar") {
+                      handleIsOpenCalendar(e);
+                    }
+
+                    if (item.list === "All events") {
+                      handleUserEventList();
                     }
                   }}
                 >
@@ -136,9 +166,14 @@ const EventListingLandingPage = () => {
                         {event.eventTitle}
                       </h3>
                       <div className="timeandDate md:text-[12px] text-[16px] md:font-semibold font-medium">
-                        <span className="day"> {event.eventDate}</span>
-                        <span> {event.eventDate}</span>
-                        <span> {event.eventStartTime} AMs</span>
+                        <span className="day">
+                          Date: <span className="pl-3">{event.eventDate}</span>
+                        </span>
+                        <div className="flex gap-[10px]">
+                          Time:
+                          <span className="pl-1"> {event.eventStartTime} </span>
+                          <span>AM</span>
+                        </div>
                       </div>
                       <p className="text-[14px]">{event.eventOverview}</p>
 
@@ -169,7 +204,15 @@ const EventListingLandingPage = () => {
       </div>
 
       <Overlay />
-    </>
+      <div
+        className={`absolute top-[230px] left-[350px] ${
+          isCalendarClose ? "block" : "hidden"
+        }  `}
+        ref={calendarRef}
+      >
+        <CalendarPage />
+      </div>
+    </div>
   );
 };
 
