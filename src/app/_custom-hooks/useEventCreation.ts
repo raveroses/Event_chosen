@@ -32,20 +32,20 @@ export function useEventCreation() {
     setEventDetailCreation((prev) => {
       const convertDate = new Date(date);
       const supabaseDate = `${convertDate.getFullYear()}-${String(
-        convertDate.getMonth() + 1
+        convertDate.getMonth() + 1,
       ).padStart(2, "0")}-${String(convertDate.getDate()).padStart(2, "0")}`;
       return { ...prev, eventDate: supabaseDate };
     });
   };
 
   const handleEventCreationOnchange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setEventDetailCreation((prev) => ({ ...prev, [name]: value }));
   };
 
-  console.log(eventDetailCreation)
+  console.log(eventDetailCreation);
   const handleEventLocationChoosen = (locationName: string) => {
     setLocationCreationChoosen(locationName);
     setEventDetailCreation((prev) => ({
@@ -122,7 +122,7 @@ export function useEventCreation() {
         console.log("User is an attendee, cannot create events");
         return;
       } else {
-        const filePath = `imagefolders/${Date.now()}_${selectImageFile.name}`;
+        const filePath = `eventcreationImageFolder/${Date.now()}_${selectImageFile.name}`;
 
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("eventimages")
@@ -189,7 +189,7 @@ export function useEventCreation() {
       }
       console.log("Fetched data:", data);
       const allListedByIdUser = data?.filter(
-        (event) => event.user_id === session?.session?.user.id
+        (event) => event.user_id === session?.session?.user.id,
       );
       if (allListedByIdUser) {
         setEachUserEventCreationList(allListedByIdUser);
@@ -312,5 +312,6 @@ export function useEventCreation() {
     dateSetter,
     setDateSetter,
     handleUserEventList,
+    allListUserEventValue
   };
 }

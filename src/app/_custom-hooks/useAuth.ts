@@ -1,15 +1,16 @@
 "use client";
-import { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { AuthenticatedDetail } from "../_types/types";
 import supabase from "../_supabase/ceateclient";
 import { UserProfile } from "../_types/types";
 import { userChoice } from "../_types/types";
+import { WelcomeEmail } from "../_types/types";
+import { LoginDetail } from "../_types/types";
 import { AuthError } from "@supabase/supabase-js";
-import { error } from "console";
+
 const localHostUrl = process.env.NEXT_PUBLIC__URL;
-// const typeUser = process.env.NEXT_PUBLIC_CHOICEfUL;
 
 export function useAuth() {
   const [userChoiceList] = useState<userChoice[]>([
@@ -26,8 +27,6 @@ export function useAuth() {
   ]);
 
   const [loading, setLoading] = useState<boolean>(false);
-  // const [isUserLoggedInBefore, setIsUserLoggedInBefore] =
-  //   useState<boolean>(false);
 
   const router = useRouter();
 
@@ -44,30 +43,47 @@ export function useAuth() {
       password: "",
     });
   const isEmail = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{3,}$/;
+  const [welcomeEmail, setWelcomeEmail] = useState<WelcomeEmail>({
+    email: "",
+  });
 
   const handleSignUpOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setAuthenticationDetail((prev) => ({ ...prev, [name]: value }));
+    setWelcomeEmail((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSignUpFormContinuation = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
     setLoading(true);
 
     if (
-      !isEmail.test(authenticationDetail.signUpEmail.trim()) ||
-      !authenticationDetail.signUpEmail
+      !isEmail.test(welcomeEmail.email.trim()) ||
+      !welcomeEmail.email.trim()
     ) {
-      toast.error("Re-check all fields");
+      toast.error("Please, check the field");
       setLoading(false);
       return;
     }
 
     await new Promise((r) => setTimeout(r, 1000));
+    authenticationDetail.signUpEmail = welcomeEmail.email;
+    setWelcomeEmail({
+      email: "",
+    });
+    toast.success("Successfully added your email");
     router.push("/user-detail");
     setLoading(false);
+  };
+
+ 
+
+  const handleSignUpNewUserOnchange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const { name, value } = e.target;
+    setAuthenticationDetail((prev) => ({ ...prev, [name]: value }));
   };
 
   const signUpNewUser = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -79,7 +95,8 @@ export function useAuth() {
         !authenticationDetail.firstName.trim() ||
         !authenticationDetail.lastName.trim() ||
         !authenticationDetail.password.trim() ||
-        !isEmail.test(authenticationDetail.signUpEmail.trim())
+        !isEmail.test(authenticationDetail.signUpEmail.trim()) ||
+        !authenticationDetail.signUpEmail.trim()
       ) {
         toast.error("Re-check all fields");
         return;
@@ -97,6 +114,7 @@ export function useAuth() {
         },
       });
       if (data.session) {
+        toast.success("Redirecting to login page");
         router.push("/login");
       } else {
         router.push("/sign-up");
@@ -119,43 +137,39 @@ export function useAuth() {
     });
   };
 
+  const [loginDetail, setLoginDetail] = useState<LoginDetail>({
+    email: "",
+    password: "",
+  });
+  const handleLoginOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setLoginDetail((prev) => ({ ...prev, [name]: value }));
+  };
   const signInWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1000));
-
+    const emailTrim = loginDetail.email.trim();
+    const passwordTrim = loginDetail.password.trim();
     try {
-      if (
-        !authenticationDetail.password.trim() ||
-        !isEmail.test(authenticationDetail.signUpEmail.trim())
-      ) {
-        toast.error("Re-check all fields");
+      if (!passwordTrim || !isEmail.test(emailTrim)) {
+        toast.error("Please, re-check all fields");
         return;
       }
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: authenticationDetail.signUpEmail.trim(),
-        password: authenticationDetail.password,
+      const { data: session, error } = await supabase.auth.signInWithPassword({
+        email: emailTrim,
+        password: passwordTrim,
       });
 
-      if (!data.session) {
+      if (error) {
         toast.error(error?.message);
-        router.push("/login");
         return;
       }
 
-      const { data: userTableFetching, error: userTableFetchingError } =
-        await supabase.from("users").select("*");
-
-      const {
-        data: { session },
-        error: userSessionError,
-      } = await supabase.auth.getSession();
-
-      if (userSessionError || !session?.user) {
-        console.log("No active session:", userSessionError);
-        return;
-      }
+      const { data: userTableFetching } = await supabase
+        .from("users")
+        .select("*");
 
       console.log("Session UID:", session.user.id);
 
@@ -167,8 +181,10 @@ export function useAuth() {
       });
 
       if (!isExistedUser) {
+        toast.success("Redirctiong to profile category");
         router.push("/profile-user-setting");
       } else {
+        toast.success("successfully login");
         router.push("/");
       }
     } catch (e: unknown) {
@@ -180,6 +196,11 @@ export function useAuth() {
     } finally {
       setLoading(false);
     }
+
+    setLoginDetail({
+      email: "",
+      password: "",
+    });
   };
 
   const handleUserChoice = async (rolesChoice: string) => {
@@ -199,7 +220,6 @@ export function useAuth() {
         return;
       }
 
-      console.log("Session UID:", session.user.id);
 
       const payload: UserProfile = {
         email: session.user.email ?? "",
@@ -220,6 +240,7 @@ export function useAuth() {
         return;
       }
       console.log("Inserted user:", user);
+      toast.success("successfully login")
       router.push("/");
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -232,6 +253,8 @@ export function useAuth() {
     }
   };
 
+
+  
   const handleGoogleSignIn = async () => {
     setLoading(true);
     await new Promise((resolve) => {
@@ -327,7 +350,7 @@ export function useAuth() {
       authenticationDetail.signUpEmail,
       {
         redirectTo: `${localHostUrl}password-reset  `,
-      }
+      },
     );
     setAuthenticationDetail({
       signUpEmail: "",
@@ -338,7 +361,7 @@ export function useAuth() {
   };
 
   const handlePasswordChangerInput = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
     setLoading(true);
@@ -395,7 +418,7 @@ export function useAuth() {
           if (!session) {
             router.push("/sign-up");
           }
-        }
+        },
       );
 
       subscription = sub.subscription;
@@ -419,7 +442,7 @@ export function useAuth() {
         console.error("Failed to read from localStorage:", error);
         return false;
       }
-    }
+    },
   );
   const handleBecomeOrganizerOnchange = (e: ChangeEvent<HTMLInputElement>) => {
     setIsBecomingOrganizer(e.target.checked);
@@ -448,7 +471,7 @@ export function useAuth() {
           setIsBecomingOrganizer(isUserRole);
           localStorage.setItem(
             "isBecomingOrganizerBoolean",
-            String(isUserRole)
+            String(isUserRole),
           );
         } else {
           setIsBecomingOrganizer(false);
@@ -509,5 +532,9 @@ export function useAuth() {
     // displayBecomeAuser,
     isBecomingOrganizer,
     handleBecomeOrganizerOnchange,
+    welcomeEmail,
+    handleSignUpNewUserOnchange,
+    loginDetail,
+    handleLoginOnChange,
   };
 }

@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import createcontext from "./CreateContext";
 import { useEventData } from "./useEventData";
 import { useEventCreation } from "./useEventCreation";

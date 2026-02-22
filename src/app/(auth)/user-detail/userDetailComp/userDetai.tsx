@@ -4,8 +4,12 @@ import useAppContext from "@/app/_custom-hooks/useAppContext";
 import { DesktopLogo } from "@/app/_logo-sizes/Logo";
 import { Spinner } from "@/components/ui/spinner";
 const UserDetail = () => {
-  const { authenticationDetail, handleSignUpOnchange, signUpNewUser, loading } =
-    useAppContext();
+  const {
+    authenticationDetail,
+    signUpNewUser,
+    loading,
+    handleSignUpNewUserOnchange,
+  } = useAppContext();
   return (
     <section className="absolute md:top-[200px] top-[0px] md:left-[700px] bg-white md:w-[420px] w-full md:h-auto h-[750px] opacity-75 md:px-[35px] px-[20px] md:py-[50px] py-[100px] z-30 ">
       <DesktopLogo />
@@ -16,7 +20,7 @@ const UserDetail = () => {
         <input
           type="email"
           value={authenticationDetail.signUpEmail}
-          onChange={handleSignUpOnchange}
+          onChange={handleSignUpNewUserOnchange}
           required
           className="border-2 w-full p-[12px] rounded placeholder:text-[13px] font-semibold"
           placeholder="JohnDoe@gmail.com"
@@ -25,7 +29,7 @@ const UserDetail = () => {
           type="text"
           name="firstName"
           value={authenticationDetail.firstName}
-          onChange={handleSignUpOnchange}
+          onChange={handleSignUpNewUserOnchange}
           required
           className="border-2 w-full p-[12px] rounded placeholder:text-[13px] font-semibold"
           placeholder="First name"
@@ -34,7 +38,7 @@ const UserDetail = () => {
           type="text"
           name="lastName"
           value={authenticationDetail.lastName}
-          onChange={handleSignUpOnchange}
+          onChange={handleSignUpNewUserOnchange}
           required
           className="border-2 w-full p-[12px] rounded placeholder:text-[13px] font-semibold"
           placeholder="Last name"
@@ -44,7 +48,7 @@ const UserDetail = () => {
           type="password"
           name="password"
           value={authenticationDetail.password}
-          onChange={handleSignUpOnchange}
+          onChange={handleSignUpNewUserOnchange}
           required
           className="border-2 w-full p-[12px] rounded placeholder:text-[13px] font-semibold"
           placeholder="Enter password"

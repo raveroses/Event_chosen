@@ -36,7 +36,7 @@ export type Context = {
   handleAllClick: (eventDay: string) => void;
   eventDays: string;
   handleEventCreationOnchange: (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
   eventDetailCreation: Event;
   handleEventLocationChoosen: (locationName: string) => void;
@@ -62,7 +62,7 @@ export type Context = {
   handleSignUpOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
   authenticationDetail: AuthenticatedDetail;
   handleSignUpFormContinuation: (
-    e: FormEvent<HTMLFormElement>
+    e: FormEvent<HTMLFormElement>,
   ) => Promise<void>;
   signUpNewUser: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   signInWithEmail: (e: FormEvent<HTMLFormElement>) => Promise<void>;
@@ -84,6 +84,10 @@ export type Context = {
   dateSetter: Date | undefined;
   setDateSetter: React.Dispatch<React.SetStateAction<Date | undefined>>;
   handleUserEventList: () => Promise<void>;
+  welcomeEmail: WelcomeEmail;
+  handleSignUpNewUserOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
+  loginDetail: LoginDetail;
+  handleLoginOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export type InputCard = {
@@ -116,6 +120,14 @@ export type UserProfile = {
   email: string;
 };
 
+export type WelcomeEmail = {
+  email: string;
+};
+
+export type LoginDetail = {
+  email: string;
+  password: string;
+};
 // export type EventDetail = {
 //   eventTitle: string;
 //   eventSummary: string;

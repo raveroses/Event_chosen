@@ -5,8 +5,8 @@ import useAppContext from "@/app/_custom-hooks/useAppContext";
 import { Spinner } from "@/components/ui/spinner";
 const LoginPage = () => {
   const {
-    authenticationDetail,
-    handleSignUpOnchange,
+    loginDetail,
+    handleLoginOnChange ,
     signInWithEmail,
     loading,
   } = useAppContext();
@@ -21,19 +21,19 @@ const LoginPage = () => {
       >
         <input
           type="email"
-          name="signUpEmail"
-          value={authenticationDetail.signUpEmail}
+          name="email"
+          value={loginDetail.email}
           className="border-2 w-full p-[12px] rounded"
           placeholder="Enter email"
-          onChange={handleSignUpOnchange}
+          onChange={handleLoginOnChange }
         />
         <input
           type="password"
           name="password"
-          value={authenticationDetail.password}
+          value={loginDetail.password}
           className="border-2 w-full p-[12px] rounded"
           placeholder="Enter password"
-          onChange={handleSignUpOnchange}
+          onChange={handleLoginOnChange }
         />
         <Link
           href={"/reset-password"}

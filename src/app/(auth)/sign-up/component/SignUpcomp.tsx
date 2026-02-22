@@ -9,7 +9,7 @@ const SignUpcomp = () => {
     handleGoogleSignIn,
     handleFacebook,
     handleSignUpOnchange,
-    authenticationDetail,
+    welcomeEmail,
     handleSignUpFormContinuation,
     loading,
   } = useAppContext();
@@ -24,9 +24,9 @@ const SignUpcomp = () => {
       <form onSubmit={handleSignUpFormContinuation}>
         <input
           type="email"
-          name="signUpEmail"
+          name="email"
           placeholder="Email"
-          value={authenticationDetail.signUpEmail}
+          value={welcomeEmail.email}
           className="border w-full  p-[15px]"
           onChange={handleSignUpOnchange}
         />
