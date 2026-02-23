@@ -15,7 +15,7 @@ const LocationSearching = () => {
     eventFilter,
     eventInputSearch,
     eventLocation,
-    handleAllClick,
+    handleEventFilter,
     allEvents,
   } = useAppContext();
 
@@ -40,7 +40,7 @@ const LocationSearching = () => {
                   : "border-none"
               }`}
               key={index}
-              onClick={() => handleAllClick(eventDay)}
+              onClick={() => handleEventFilter(eventDay)}
             >
               {eventDay}
             </div>
@@ -65,7 +65,8 @@ const LocationSearching = () => {
         </div>
 
         <div className=" grid md:grid-cols-4 grid-col-1 md:gap-[90px] gap-[30px] py-[50px]">
-          {(eventInputSearch.length > 0 ? eventInputSearch : eventFilter).map(
+          {/* {(eventInputSearch.length > 0 ? eventInputSearch : eventFilter).map( */}
+          {( eventFilter.length > 0 ? eventFilter :allEvents).map(
             (event, index) => {
               return (
                 <div
@@ -107,7 +108,7 @@ const LocationSearching = () => {
                   </div>
                 </div>
               );
-            }
+            },
           )}
         </div>
       </div>

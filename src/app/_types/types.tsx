@@ -1,11 +1,4 @@
-import {
-  ChangeEvent,
-  Dispatch,
-  FormEvent,
-  KeyboardEvent,
-  ReactNode,
-  SetStateAction,
-} from "react";
+import { ChangeEvent, FormEvent, KeyboardEvent, ReactNode } from "react";
 
 export type Event = {
   eventCategory: string;
@@ -19,6 +12,8 @@ export type Event = {
   eventStartTime: string;
   user_id?: string;
 };
+
+
 export type Context = {
   handleSeachFocus: (e: ChangeEvent<HTMLInputElement>) => void;
   handleSearchEventEnter: (event?: KeyboardEvent<HTMLInputElement>) => void;
@@ -33,7 +28,7 @@ export type Context = {
   // eventData: Event[];
   eventFilter: Event[];
   eventInputSearch: Event[];
-  handleAllClick: (eventDay: string) => void;
+  handleEventFilter: (eventDay: string) => void;
   eventDays: string;
   handleEventCreationOnchange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

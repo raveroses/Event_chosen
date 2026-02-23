@@ -43,14 +43,16 @@ export function useEventData() {
         if (eventDefault && data) {
           setAllEvents([...data, ...eventDefault]);
         }
-      } catch (e) {
-        console.log(e);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          toast.error(e.message);
+        }
       }
     };
     fetchingEvent();
   }, []);
 
-  const handleAllClick = (eventDay: string) => {
+  const handleEventFilter = (eventDay: string) => {
     const eventDayLowercase = eventDay.toLowerCase();
     const date = new Date();
     const currentDate = date.getDate();
@@ -58,7 +60,6 @@ export function useEventData() {
     const currentYear = date.getFullYear();
 
     if (eventDayLowercase === "all") {
-      // setEventFilter(eventData);
       setEventFilter([...allEvents]);
     } else if (eventDayLowercase === "today") {
       const searchingCurrentDate = allEvents.filter((event) => {
@@ -94,21 +95,37 @@ export function useEventData() {
         const eventDay = new Date(event.eventDate).getDay();
         const eventWeekendDay = weekDays[eventDay].toLowerCase();
 
-        return eventWeekendDay === "monday" || eventWeekendDay === "tuesday";
+        return eventWeekendDay === "saturday" || eventWeekendDay === "sunday";
       });
 
       return searchingWeekend
         ? setEventFilter(searchingWeekend)
         : setEventFilter([]);
-    } else {
-      setEventFilter([]);
     }
     setEventDays(eventDay);
   };
 
   const handleSeachFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setSearchFocus((prev) => ({ ...prev, [name]: value }));
+
+    const userSearch = value.toLowerCase().trim();
+
+    if (!userSearch) {
+      setEventFilter([]);
+      return;
+    }
+
+    const splitUserWord = userSearch.split(" ");
+
+    const userSearchResult = allEvents.filter((eachEvent) => {
+      const eventTitle = eachEvent.eventTitle.toLowerCase().trim();
+
+      return splitUserWord.some((eachWord) => eventTitle.includes(eachWord));
+    });
+
+    setEventFilter(userSearchResult);
   };
 
   const handleSearchValidation = () => {
@@ -191,16 +208,8 @@ export function useEventData() {
       }
       setEventFilter(filtered);
     }
-  }, [eventLocation, allEvents, searchFocus.searchValue, eventInputSearch]);
+  }, [eventLocation, allEvents, eventInputSearch]);
 
-  // const [currentDateFilter,setCurrentDateFilter]= useState({
-  //   todaysDate:"",
-  //   weeklyDate:""
-  // })
-
-  // const handleCurrentDateFilter=()=>{
-
-  // }
   return {
     // eventData,
     eventLocation,
@@ -215,7 +224,7 @@ export function useEventData() {
     handleSearchLocationBlur,
     eventFilter,
     eventInputSearch,
-    handleAllClick,
+    handleEventFilter,
     eventDays,
     allEvents,
   };
