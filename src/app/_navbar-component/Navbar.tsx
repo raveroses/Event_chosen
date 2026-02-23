@@ -70,7 +70,7 @@ const Navbar = () => {
     );
   });
 
-  const searchHistoryMap = searchFocus.searchHistory.map((item, index) => {
+  const searchHistoryMap =  searchFocus.searchHistory.map((item, index) => {
     return (
       <div className="flex items-center gap-[20px]" key={index}>
         <span>

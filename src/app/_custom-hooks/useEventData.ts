@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Event, Search } from "../_types/types";
 import { toast } from "react-toastify";
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_API_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -50,9 +51,55 @@ export function useEventData() {
   }, []);
 
   const handleAllClick = (eventDay: string) => {
-    if (eventDay === "All") {
+    const eventDayLowercase = eventDay.toLowerCase();
+    const date = new Date();
+    const currentDate = date.getDate();
+    const currentMonth = date.getMonth();
+    const currentYear = date.getFullYear();
+
+    if (eventDayLowercase === "all") {
       // setEventFilter(eventData);
       setEventFilter([...allEvents]);
+    } else if (eventDayLowercase === "today") {
+      const searchingCurrentDate = allEvents.filter((event) => {
+        const eventDate = new Date(event.eventDate);
+        const isConvertibleDate = eventDate.getDate();
+        const isConvertibleMonth = eventDate.getMonth();
+        const isConvertibleYear = eventDate.getFullYear();
+        console.log("DAY", new Date(eventDate).getDay());
+
+        return (
+          isConvertibleDate === currentDate &&
+          isConvertibleMonth === currentMonth &&
+          isConvertibleYear === currentYear
+        );
+      });
+
+      return searchingCurrentDate
+        ? setEventFilter(searchingCurrentDate)
+        : setEventFilter([]);
+    } else if (eventDayLowercase === "this weekend") {
+      const weekDays: string[] = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const searchingWeekend = allEvents.filter((event) => {
+        console.log("EVENT", event);
+
+        const eventDay = new Date(event.eventDate).getDay();
+        const eventWeekendDay = weekDays[eventDay].toLowerCase();
+
+        return eventWeekendDay === "monday" || eventWeekendDay === "tuesday";
+      });
+
+      return searchingWeekend
+        ? setEventFilter(searchingWeekend)
+        : setEventFilter([]);
     } else {
       setEventFilter([]);
     }
@@ -70,7 +117,7 @@ export function useEventData() {
     }
     setSearchFocus((prev) => {
       const updatedHistory = Array.from(
-        new Set([...prev.searchHistory, prev.searchValue.trim()])
+        new Set([...prev.searchHistory, prev.searchValue.trim()]),
       );
       console.log("Updated", updatedHistory);
       return {
@@ -82,7 +129,7 @@ export function useEventData() {
   };
 
   const handleSearchEventEnter = (
-    event?: React.KeyboardEvent<HTMLInputElement>
+    event?: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (!event || event.key === "Enter") {
       handleSearchValidation();
@@ -97,7 +144,7 @@ export function useEventData() {
       setEventInputSearch(searchfiltering);
     }
   };
-console.log(searchFocus.searchValue)
+
   const handleClear = () => {
     setSearchFocus((prev) => ({ ...prev, searchHistory: [], searchValue: "" }));
   };
@@ -146,6 +193,14 @@ console.log(searchFocus.searchValue)
     }
   }, [eventLocation, allEvents, searchFocus.searchValue, eventInputSearch]);
 
+  // const [currentDateFilter,setCurrentDateFilter]= useState({
+  //   todaysDate:"",
+  //   weeklyDate:""
+  // })
+
+  // const handleCurrentDateFilter=()=>{
+
+  // }
   return {
     // eventData,
     eventLocation,
