@@ -18,7 +18,7 @@ export function useEventData() {
   });
   const [eventLocation, setEventLocation] = useState<string>("");
   const [eventFilter, setEventFilter] = useState<Event[]>([]);
-  const [eventInputSearch, setEventInputSearch] = useState<Event[]>([]);
+  // const [eventInputSearch, setEventInputSearch] = useState<Event[]>([]);
   const [eventDays, setEventDays] = useState<string>("");
   const [allEvents, setAllEvents] = useState<Event[]>([]);
 
@@ -130,8 +130,10 @@ export function useEventData() {
 
   const handleSearchValidation = () => {
     if (!searchFocus.searchValue.trim() && !searchFocus.locationSearch.trim()) {
+      toast.error("Please, invalid input");
       return;
     }
+
     setSearchFocus((prev) => {
       const updatedHistory = Array.from(
         new Set([...prev.searchHistory, prev.searchValue.trim()]),
@@ -156,9 +158,9 @@ export function useEventData() {
           searchFocus.searchValue.trim().toLowerCase()
         );
       });
-      setEventFilter([]);
+      setEventFilter(searchfiltering);
       setEventLocation("");
-      setEventInputSearch(searchfiltering);
+      // setEventInputSearch(searchfiltering);
     }
   };
 
@@ -193,7 +195,7 @@ export function useEventData() {
   useEffect(() => {
     if (
       !eventLocation.trim() ||
-      eventLocation.trim() === "Use my current location"
+      eventLocation.toLowerCase().trim() === "Use my current location"
     ) {
       setEventFilter([]);
     } else {
@@ -203,12 +205,13 @@ export function useEventData() {
           eventLocation.trim().toLowerCase()
         );
       });
-      if (eventInputSearch.length > 0) {
-        setEventInputSearch([]);
-      }
+      // if (eventInputSearch.length > 0) {
+      //   setEventInputSearch([]);
+      // }
       setEventFilter(filtered);
     }
-  }, [eventLocation, allEvents, eventInputSearch]);
+  }, [eventLocation, allEvents]);
+  // }, [eventLocation, allEvents, eventInputSearch]);
 
   return {
     // eventData,
@@ -223,7 +226,7 @@ export function useEventData() {
     handleSearchLocationFocus,
     handleSearchLocationBlur,
     eventFilter,
-    eventInputSearch,
+    // eventInputSearch,
     handleEventFilter,
     eventDays,
     allEvents,

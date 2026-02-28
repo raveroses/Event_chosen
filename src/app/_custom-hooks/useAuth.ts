@@ -77,8 +77,6 @@ export function useAuth() {
     setLoading(false);
   };
 
- 
-
   const handleSignUpNewUserOnchange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -101,7 +99,7 @@ export function useAuth() {
         toast.error("Re-check all fields");
         return;
       }
-      const { data } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: authenticationDetail.signUpEmail.trim(),
         password: authenticationDetail.password.trim(),
         options: {
@@ -113,6 +111,11 @@ export function useAuth() {
           },
         },
       });
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
       if (data.session) {
         toast.success("Redirecting to login page");
         router.push("/login");
@@ -220,7 +223,6 @@ export function useAuth() {
         return;
       }
 
-
       const payload: UserProfile = {
         email: session.user.email ?? "",
         roles: rolesChoice.trim(),
@@ -240,7 +242,7 @@ export function useAuth() {
         return;
       }
       console.log("Inserted user:", user);
-      toast.success("successfully login")
+      toast.success("successfully login");
       router.push("/");
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -253,8 +255,6 @@ export function useAuth() {
     }
   };
 
-
-  
   const handleGoogleSignIn = async () => {
     setLoading(true);
     await new Promise((resolve) => {

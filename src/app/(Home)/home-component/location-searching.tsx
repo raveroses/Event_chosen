@@ -13,7 +13,7 @@ const LocationSearching = () => {
   const {
     eventDays,
     eventFilter,
-    eventInputSearch,
+    // eventInputSearch,
     eventLocation,
     handleEventFilter,
     allEvents,
@@ -51,9 +51,8 @@ const LocationSearching = () => {
       <div className="eventDisplay w-full h-full">
         <div
           className={`${
-            eventFilter.length > 0 || eventInputSearch.length > 0
-              ? "hidden"
-              : "block"
+            // eventFilter.length > 0 || eventInputSearch.length > 0
+            eventFilter.length > 0 || allEvents.length ? "hidden" : "block"
           }`}
         >
           <MdCalendarMonth className="text-[50px] m-auto " />
@@ -66,7 +65,7 @@ const LocationSearching = () => {
 
         <div className=" grid md:grid-cols-4 grid-col-1 md:gap-[90px] gap-[30px] py-[50px]">
           {/* {(eventInputSearch.length > 0 ? eventInputSearch : eventFilter).map( */}
-          {( eventFilter.length > 0 ? eventFilter :allEvents).map(
+          {(eventFilter.length > 0 ? eventFilter : allEvents).map(
             (event, index) => {
               return (
                 <div

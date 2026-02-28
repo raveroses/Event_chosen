@@ -125,7 +125,8 @@ export function useEventCreation() {
         const filePath = `eventcreationImageFolder/${Date.now()}_${selectImageFile.name}`;
 
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("eventimages")
+          // .from("eventimages")
+          .from("eventImage")
           .upload(filePath, selectImageFile, { upsert: true });
 
         console.log("DATA1", uploadData);
@@ -134,7 +135,7 @@ export function useEventCreation() {
           return;
         }
         const { data: urlData } = supabase.storage
-          .from("eventimages")
+          .from("eventImage")
           .getPublicUrl(uploadData.path);
         const publicUrl = urlData.publicUrl;
         console.log(publicUrl);
@@ -289,6 +290,9 @@ export function useEventCreation() {
     handleUserDateEventListSearch();
   }, [dateSetter]);
 
+  console.log("EVENT CREATION", eventDetailCreation);
+  console.log("ImageName", selectImageFile);
+
   return {
     eventDetailCreation,
     handleEventCreationOnchange,
@@ -312,6 +316,6 @@ export function useEventCreation() {
     dateSetter,
     setDateSetter,
     handleUserEventList,
-    allListUserEventValue
+    allListUserEventValue,
   };
 }

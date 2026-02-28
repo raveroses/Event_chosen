@@ -12,7 +12,7 @@ import { RiMenu3Fill } from "react-icons/ri";
 import { LuHistory } from "react-icons/lu";
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import { PiVideoBold } from "react-icons/pi";
-import { InputCard } from "../_types/types";
+import { Location } from "../_types/types";
 import useAppContext from "../_custom-hooks/useAppContext";
 import { useEffect, useRef, useState } from "react";
 
@@ -33,13 +33,13 @@ const Navbar = () => {
     handleBecomeOrganizerOnchange,
   } = useAppContext();
 
-  const [inputCard] = useState<InputCard[]>([
+  const [location] = useState<Location[]>([
     {
       head: "Use my current location",
       icon: <FaLocationCrosshairs />,
     },
     {
-      head: "Browse online event",
+      head: "online event",
       icon: <PiVideoBold />,
     },
     {
@@ -151,7 +151,7 @@ const Navbar = () => {
 
             <div
               className={`absolute top-20  ${
-                !isBecomingOrganizer ? "left:[350px]" : "left-[390px]"
+                !isBecomingOrganizer ? "left-[350px]" : "left-[390px]"
               }
                  w-[340px] p-5  rounded-xl z-30 bg-white       
                ${searchFocus.isSearchEventFocus ? "md:block hidden" : "hidden"}
@@ -223,7 +223,7 @@ const Navbar = () => {
            h-[150px] p-5 rounded shadow`}
         >
           <div className={`card flex flex-col gap-[20px]  `}>
-            {inputCard.map((item, index) => {
+            {location.map((item, index) => {
               return (
                 <div
                   className="flex gap-2 items-center cursor-pointer"
@@ -381,7 +381,7 @@ const Navbar = () => {
           ref={eventRef}
         >
           <div className={`card flex flex-col gap-[20px]  `}>
-            {inputCard.map((item, index) => {
+            {location.map((item, index) => {
               return (
                 <div
                   className="flex gap-2 items-center cursor-pointer"

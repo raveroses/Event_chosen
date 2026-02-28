@@ -27,7 +27,7 @@ export type Context = {
   searchFocus: Search;
   // eventData: Event[];
   eventFilter: Event[];
-  eventInputSearch: Event[];
+  // eventInputSearch: Event[];
   handleEventFilter: (eventDay: string) => void;
   eventDays: string;
   handleEventCreationOnchange: (
@@ -85,7 +85,7 @@ export type Context = {
   handleLoginOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export type InputCard = {
+export type Location = {
   [key: string]: ReactNode | string;
 };
 
