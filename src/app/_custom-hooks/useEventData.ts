@@ -21,34 +21,39 @@ export function useEventData() {
   // const [eventInputSearch, setEventInputSearch] = useState<Event[]>([]);
   const [eventDays, setEventDays] = useState<string>("");
   const [allEvents, setAllEvents] = useState<Event[]>([]);
-
   useEffect(() => {
     const fetchingEvent = async () => {
       try {
-        const { data, error } = await supabase
-          .from("eventchosen_duplicate")
-          .select("*");
+        const [duplicateRes, defaultRes] = await Promise.all([
+          supabase.from("eventchosen_duplicate").select("*"),
+          supabase.from("eventchosen").select("*"),
+        ]);
 
-        const { data: eventDefault, error: eventDefaultError } = await supabase
-          .from("eventchosen")
-          .select("*");
+        const { data, error } = duplicateRes;
+        const { data: eventDefault, error: eventDefaultError } = defaultRes;
 
-        console.log(eventDefaultError);
-        if (error) {
-          console.error("Supabase fetch error:", error.message);
-          toast.error(error.message);
+        console.log("Fetched data from eventchosen_duplicate:", data);
+        console.log("Fetched data from eventchosen:", eventDefault);
+
+        if (error || eventDefaultError) {
+          const message = error?.message || eventDefaultError?.message;
+          console.error("Supabase fetch error:", message);
+          toast.error(message);
           return;
         }
 
-        if (eventDefault && data) {
-          setAllEvents([...data, ...eventDefault]);
-        }
+        setAllEvents([...(data || []), ...(eventDefault || [])]);
+        console.log("allEvents set to:", [
+          ...(data || []),
+          ...(eventDefault || []),
+        ]);
       } catch (e: unknown) {
         if (e instanceof Error) {
           toast.error(e.message);
         }
       }
     };
+
     fetchingEvent();
   }, []);
 
@@ -60,6 +65,7 @@ export function useEventData() {
     const currentYear = date.getFullYear();
 
     if (eventDayLowercase === "all") {
+      setEventFilter([]);
       setEventFilter([...allEvents]);
     } else if (eventDayLowercase === "today") {
       const searchingCurrentDate = allEvents.filter((event) => {

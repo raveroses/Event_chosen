@@ -19,6 +19,19 @@ const LocationSearching = () => {
     allEvents,
   } = useAppContext();
 
+  const [numberEventDisplay, setNumberEventDisplay] = useState<number>(8);
+  const [eventView, setEventView] = useState<string>("View All");
+  const viewAllEvent = () => {
+    if (eventView.toLowerCase() === "view all") {
+      setNumberEventDisplay(Number(allEvents.length));
+      setEventView("View Less");
+    } else {
+      setNumberEventDisplay(Number(8));
+      setEventView("View All");
+    }
+  };
+  const totalNumberOfEvents = allEvents.slice(0, numberEventDisplay);
+
   return (
     <section className="md:p-0 px-3">
       <div
@@ -65,7 +78,7 @@ const LocationSearching = () => {
 
         <div className=" grid md:grid-cols-4 grid-col-1 md:gap-[90px] gap-[30px] py-[50px]">
           {/* {(eventInputSearch.length > 0 ? eventInputSearch : eventFilter).map( */}
-          {(eventFilter.length > 0 ? eventFilter : allEvents).map(
+          {(eventFilter.length > 0 ? eventFilter : totalNumberOfEvents).map(
             (event, index) => {
               return (
                 <div
@@ -110,6 +123,16 @@ const LocationSearching = () => {
             },
           )}
         </div>
+      </div>
+
+      <div className="flex justify-center">
+        <button
+          className="bg-[#800080] text-white w-[300px] p-2 text-center my-5 rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+          onClick={viewAllEvent}
+          disabled={allEvents.length <= 8 || eventFilter.length > 0}
+        >
+          {eventView}
+        </button>
       </div>
     </section>
   );

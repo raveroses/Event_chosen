@@ -46,7 +46,7 @@ export function useEventCreation() {
     setEventDetailCreation((prev) => ({ ...prev, [name]: value }));
   };
 
-  console.log(eventDetailCreation);
+  // console.log(eventDetailCreation);
   const handleEventLocationChoosen = (locationName: string) => {
     setLocationCreationChoosen(locationName);
     setEventDetailCreation((prev) => ({
@@ -55,11 +55,7 @@ export function useEventCreation() {
     }));
   };
 
-  const eventCreationYear = new Date(
-    eventDetailCreation.eventDate,
-  ).getFullYear();
 
-  console.log("eventCreationYear", eventCreationYear);
   const handleEventCreationValidation = (): boolean => {
     if (
       !eventDetailCreation.eventTitle.trim() ||
@@ -91,7 +87,7 @@ export function useEventCreation() {
     ).getFullYear();
 
     console.log("eventCreationYear", eventCreationYear);
-    if (currentYear < eventCreationYear) {
+    if (eventCreationYear < currentYear) {
       toast.error("Please,enter valid Year");
       return false;
     }

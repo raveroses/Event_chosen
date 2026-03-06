@@ -407,7 +407,7 @@ export function useAuth() {
     let subscription: { unsubscribe: () => void } | null = null;
 
     const handleRouteProtection = async () => {
-      const { data, error } = await supabase.auth.getSession();
+      const { data } = await supabase.auth.getSession();
       if (!data.session) {
         router.push("/sign-up");
         return;
@@ -491,7 +491,7 @@ export function useAuth() {
     fetchUserRole();
   }, []);
 
-  console.log("isbecoming organizer", isBecomingOrganizer);
+  // console.log("isbecoming organizer", isBecomingOrganizer);
 
   useEffect(() => {
     const updateUserRole = async () => {

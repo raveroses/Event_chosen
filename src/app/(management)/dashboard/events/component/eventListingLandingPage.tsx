@@ -71,6 +71,8 @@ const EventListingLandingPage = () => {
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
+
+
   return (
     <div className="relative">
       <h1 className="text-[40px] font-bold">Events</h1>
