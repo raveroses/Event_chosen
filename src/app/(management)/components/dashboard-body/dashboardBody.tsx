@@ -1,10 +1,10 @@
 "use client";
-import Link from "next/link";
 import { PiCaretDownBold, PiCaretLeftBold } from "react-icons/pi";
 import Image from "next/image";
 import { MdCalendarMonth } from "react-icons/md";
 import { useState } from "react";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
+import { useRouter } from "next/navigation";
 const DashboardFirstBody = () => {
   const [inputContent] = useState<{ heading: string; pcontent?: string }[]>([
     {
@@ -14,16 +14,17 @@ const DashboardFirstBody = () => {
     },
   ]);
   const { eventDetailCreation } = useAppContext();
+  const router = useRouter();
 
   return (
     <section className="">
-      <Link
-        href={"/"}
-        className="text-blue-600 flex gap-[6px] items-center text-[12px] border-b border-gray-300 p-[13px] "
+      <div
+        className="text-blue-600 flex gap-[6px] items-center text-[12px] border-b border-gray-300 p-[13px] cursor-pointer "
+        onClick={() => router.back()}
       >
         <PiCaretLeftBold />
         <p>Back to events</p>
-      </Link>
+      </div>
 
       <div className="relative bg-white rounded-xl shadow w-[275px] h-[240px] my-[35px] ">
         <Image

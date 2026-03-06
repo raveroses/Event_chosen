@@ -34,6 +34,7 @@ export function useEventCreation() {
       const supabaseDate = `${convertDate.getFullYear()}-${String(
         convertDate.getMonth() + 1,
       ).padStart(2, "0")}-${String(convertDate.getDate()).padStart(2, "0")}`;
+
       return { ...prev, eventDate: supabaseDate };
     });
   };
@@ -54,13 +55,18 @@ export function useEventCreation() {
     }));
   };
 
+  const eventCreationYear = new Date(
+    eventDetailCreation.eventDate,
+  ).getFullYear();
+
+  console.log("eventCreationYear", eventCreationYear);
   const handleEventCreationValidation = (): boolean => {
     if (
       !eventDetailCreation.eventTitle.trim() ||
       !eventDetailCreation.eventSummary.trim() ||
       !eventDetailCreation.eventCategory.trim() ||
       !selectImageFile?.name ||
-      !eventDetailCreation.eventOverview ||
+      !eventDetailCreation.eventOverview.trim() ||
       !eventDetailCreation.eventStartTime.trim() ||
       !eventDetailCreation.eventLocationsCreate.trim() ||
       !eventDetailCreation.eventDate ||
@@ -68,6 +74,25 @@ export function useEventCreation() {
     ) {
       setPreviewImage("");
       toast.error("Re-check all fields");
+      return false;
+    }
+
+    const eventOverViewLimit = eventDetailCreation.eventOverview.split(" ");
+
+    if (eventOverViewLimit.length > 20) {
+      toast.error("The length should not be more than 20");
+      console.log("The length should not be more than 20");
+      return false;
+    }
+
+    const currentYear = new Date().getFullYear();
+    const eventCreationYear = new Date(
+      eventDetailCreation.eventDate,
+    ).getFullYear();
+
+    console.log("eventCreationYear", eventCreationYear);
+    if (currentYear < eventCreationYear) {
+      toast.error("Please,enter valid Year");
       return false;
     }
     return true;
@@ -149,6 +174,7 @@ export function useEventCreation() {
         console.log("DATA=>", insertData, "ERROR=>", insertError);
       }
 
+      toast.success("Event successfully created");
       setEventDetailCreation({
         eventTitle: "",
         eventSummary: "",
@@ -289,9 +315,6 @@ export function useEventCreation() {
 
     handleUserDateEventListSearch();
   }, [dateSetter]);
-
-  console.log("EVENT CREATION", eventDetailCreation);
-  console.log("ImageName", selectImageFile);
 
   return {
     eventDetailCreation,

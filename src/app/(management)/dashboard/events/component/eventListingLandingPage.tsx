@@ -143,6 +143,8 @@ const EventListingLandingPage = () => {
                 ? filteringEvent
                 : eachUserEventCreationList
               ).map((event, index) => {
+           
+
                 return (
                   <div
                     className={`card-cover hover:shadow-lg transition-all duration-200 cursor-pointer md:w-[300px] w-full h-auto pb-[10px] rounded-xl ${
@@ -175,7 +177,7 @@ const EventListingLandingPage = () => {
                           <span>AM</span>
                         </div>
                       </div>
-                      <p className="text-[14px]">{event.eventOverview}</p>
+                      {/* <p className="text-[14px]">{event.eventOverview}</p> */}
 
                       <h3 className="md:text-[13px] text-[14px] font-semibold">
                         {event.eventCategory}
