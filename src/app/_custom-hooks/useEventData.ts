@@ -19,7 +19,8 @@ export function useEventData() {
   const [eventLocation, setEventLocation] = useState<string>("");
   const [eventFilter, setEventFilter] = useState<Event[]>([]);
   // const [eventInputSearch, setEventInputSearch] = useState<Event[]>([]);
-  const [eventDays, setEventDays] = useState<string>("");
+  const [eventDays, setEventDays] = useState<string>("all");
+
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   useEffect(() => {
     const fetchingEvent = async () => {
@@ -43,6 +44,7 @@ export function useEventData() {
         }
 
         setAllEvents([...(data || []), ...(eventDefault || [])]);
+     
         console.log("allEvents set to:", [
           ...(data || []),
           ...(eventDefault || []),
@@ -57,15 +59,23 @@ export function useEventData() {
     fetchingEvent();
   }, []);
 
-  const handleEventFilter = (eventDay: string) => {
-    const eventDayLowercase = eventDay.toLowerCase();
+
+  useEffect(() => {
+    if(allEvents.length > 0) {
+        setEventFilter([...allEvents]);
+    }
+}, [allEvents]);
+  console.log("FIlter", eventFilter);
+  const handleEventFilter = (eachEventDay: string) => {
+    const eventDayLowercase = eachEventDay.toLowerCase();
+    setEventDays(eventDayLowercase);
+
     const date = new Date();
     const currentDate = date.getDate();
     const currentMonth = date.getMonth();
     const currentYear = date.getFullYear();
 
     if (eventDayLowercase === "all") {
-      setEventFilter([]);
       setEventFilter([...allEvents]);
     } else if (eventDayLowercase === "today") {
       const searchingCurrentDate = allEvents.filter((event) => {
@@ -73,7 +83,6 @@ export function useEventData() {
         const isConvertibleDate = eventDate.getDate();
         const isConvertibleMonth = eventDate.getMonth();
         const isConvertibleYear = eventDate.getFullYear();
-        console.log("DAY", new Date(eventDate).getDay());
 
         return (
           isConvertibleDate === currentDate &&
@@ -82,9 +91,15 @@ export function useEventData() {
         );
       });
 
-      return searchingCurrentDate
-        ? setEventFilter(searchingCurrentDate)
-        : setEventFilter([]);
+      // return searchingCurrentDate
+      //   ? setEventFilter(searchingCurrentDate)
+      //   : setEventFilter([]);
+
+      if (searchingCurrentDate.length === 0) {
+        setEventFilter([]);
+      } else {
+        setEventFilter(searchingCurrentDate);
+      }
     } else if (eventDayLowercase === "this weekend") {
       const weekDays: string[] = [
         "Sunday",
@@ -108,7 +123,6 @@ export function useEventData() {
         ? setEventFilter(searchingWeekend)
         : setEventFilter([]);
     }
-    setEventDays(eventDay);
   };
 
   const handleSeachFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,12 +212,35 @@ export function useEventData() {
     }, 1000);
   };
 
-  useEffect(() => {
-    if (
-      !eventLocation.trim() ||
-      eventLocation.toLowerCase().trim() === "Use my current location"
+  // useEffect(() => {
+  //   if (
+  //     !eventLocation.trim() ||
+  //     eventLocation.toLowerCase().trim() === "Use my current location"
+  //   ) {
+  //     setEventFilter([]);
+  //   } else {
+  //     const filtered = allEvents.filter((event) => {
+  //       return (
+  //         event.eventLocationsCreate.trim().toLowerCase() ===
+  //         eventLocation.trim().toLowerCase()
+  //       );
+  //     });
+  //     // if (eventInputSearch.length > 0) {
+  //     //   setEventInputSearch([]);
+  //     // }
+  //     setEventFilter(filtered);
+  //   }
+  // }, [eventLocation, allEvents]);
+  // }, [eventLocation, allEvents, eventInputSearch]);
+useEffect(() => {
+    if (!eventLocation.trim() ||
+        eventLocation.toLowerCase().trim() === "Use my current location"
     ) {
-      setEventFilter([]);
+      // ✅ Only reset if no day filter is active
+      if(eventDays === "all") {
+          setEventFilter([...allEvents]);
+      }
+      // if a day filter is active, do nothing — leave it alone
     } else {
       const filtered = allEvents.filter((event) => {
         return (
@@ -211,13 +248,9 @@ export function useEventData() {
           eventLocation.trim().toLowerCase()
         );
       });
-      // if (eventInputSearch.length > 0) {
-      //   setEventInputSearch([]);
-      // }
       setEventFilter(filtered);
     }
-  }, [eventLocation, allEvents]);
-  // }, [eventLocation, allEvents, eventInputSearch]);
+}, [eventLocation, allEvents]);
 
   return {
     // eventData,
