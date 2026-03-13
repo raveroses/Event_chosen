@@ -13,7 +13,6 @@ export type Event = {
   user_id?: string;
 };
 
-
 export type Context = {
   handleSeachFocus: (e: ChangeEvent<HTMLInputElement>) => void;
   handleSearchEventEnter: (event?: KeyboardEvent<HTMLInputElement>) => void;
@@ -123,6 +122,11 @@ export type LoginDetail = {
   email: string;
   password: string;
 };
+export type CreateList = {
+  icon: ReactNode;
+  list: string;
+};
+
 // export type EventDetail = {
 //   eventTitle: string;
 //   eventSummary: string;

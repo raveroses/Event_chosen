@@ -46,6 +46,27 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+.sharetooltips::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent #374151 transparent;
+}
+
+.likeTootip::after {
+  content: "";
+  border-width: 5px;
+  border-style: solid;
+  border-color: #374151 transparent transparent transparent;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

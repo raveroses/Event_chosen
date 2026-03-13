@@ -1,6 +1,5 @@
 "use client";
 import { MdCalendarMonth } from "react-icons/md";
-
 import Image from "next/image";
 import { useState } from "react";
 import useAppContext from "@/app/_custom-hooks/useAppContext";

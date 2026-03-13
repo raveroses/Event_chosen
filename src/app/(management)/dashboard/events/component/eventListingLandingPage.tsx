@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { FaList, FaPlus, FaRegCalendar } from "react-icons/fa6";
 import { PiCaretDownBold } from "react-icons/pi";
@@ -9,17 +9,13 @@ import useAppContext from "@/app/_custom-hooks/useAppContext";
 import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
 import CalendarPage from "./calendarPage";
+import { CreateList } from "@/app/_types/types";
 const supabaseLoader = ({ src }: { src: string }) => {
   return src;
 };
 
 const EventListingLandingPage = () => {
-  const [createList] = useState<
-    {
-      icon: ReactNode;
-      list: string;
-    }[]
-  >([
+  const [createList] = useState<CreateList[]>([
     {
       icon: <CiSearch />,
       list: "Search",
@@ -71,8 +67,6 @@ const EventListingLandingPage = () => {
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-
-
   return (
     <div className="relative">
       <h1 className="text-[40px] font-bold">Events</h1>
@@ -104,15 +98,15 @@ const EventListingLandingPage = () => {
                     item.list !== "All events" ? "hidden md:flex" : "flex"
                   }`}
                   onClick={(e) => {
-                    if (item.list === "Search") {
+                    if (item.list.toLowerCase() === "search") {
                       handleUserEventListSearch();
                     }
 
-                    if (item.list === "Calendar") {
+                    if (item.list.toLowerCase() === "calendar") {
                       handleIsOpenCalendar(e);
                     }
 
-                    if (item.list === "All events") {
+                    if (item.list.toLowerCase() === "all events") {
                       handleUserEventList();
                     }
                   }}
@@ -145,8 +139,6 @@ const EventListingLandingPage = () => {
                 ? filteringEvent
                 : eachUserEventCreationList
               ).map((event, index) => {
-           
-
                 return (
                   <div
                     className={`card-cover hover:shadow-lg transition-all duration-200 cursor-pointer md:w-[300px] w-full h-auto pb-[10px] rounded-xl ${
