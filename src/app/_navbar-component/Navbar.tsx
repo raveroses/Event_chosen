@@ -112,6 +112,12 @@ const Navbar = () => {
     { href: "/sign-up", label: "Sign Up" },
   ];
 
+    const isUserLogIn = [
+    { href: "/", label: "Find Events" },
+    { href: "/dashboard/events", label: "Create Events" },
+    { href: "/", label: "Find my tickets" },
+  ];
+
   const navLinkMap = navLinks.map((navLink, index) => {
     return (
       <Link href={navLink.href} key={index}>

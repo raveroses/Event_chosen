@@ -402,7 +402,7 @@ export function useAuth() {
       password: "",
     });
   };
-
+  let isUserTrue = false;
   useEffect(() => {
     let subscription: { unsubscribe: () => void } | null = null;
 
@@ -417,11 +417,13 @@ export function useAuth() {
         (event, session) => {
           if (!session) {
             router.push("/sign-up");
+            return;
           }
         },
       );
 
       subscription = sub.subscription;
+      isUserTrue = true;
     };
 
     handleRouteProtection();
@@ -431,6 +433,8 @@ export function useAuth() {
     };
   }, [router]);
 
+  console.log("ISUSERTRUE",isUserTrue);
+  
   const [isBecomingOrganizer, setIsBecomingOrganizer] = useState<boolean>(
     () => {
       if (typeof window === "undefined") return false;
@@ -516,20 +520,23 @@ export function useAuth() {
     updateUserRole();
   }, [isBecomingOrganizer]);
 
-useEffect(() => {
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
 
-    const dateOnboarded = new Date(user.created_at);
-    const dateSignedIn = new Date(user.last_sign_in_at!);
-    const diffInSeconds = (dateSignedIn.getTime() - dateOnboarded.getTime()) / 1000;
-    const isNewUser = diffInSeconds < 5;
+      const dateOnboarded = new Date(user.created_at);
+      const dateSignedIn = new Date(user.last_sign_in_at!);
+      const diffInSeconds =
+        (dateSignedIn.getTime() - dateOnboarded.getTime()) / 1000;
+      const isNewUser = diffInSeconds < 5;
 
-    router.push(isNewUser ? "/profile-user-setting" : "/");
-  };
-  checkUser();
-}, [router]);
+      router.push(isNewUser ? "/profile-user-setting" : "/");
+    };
+    checkUser();
+  }, [router]);
   return {
     authenticationDetail,
     handleSignUpOnchange,
