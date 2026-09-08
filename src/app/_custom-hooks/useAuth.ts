@@ -264,7 +264,7 @@ export function useAuth() {
       await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/`,
         },
       });
     } catch (e: unknown) {
@@ -515,6 +515,21 @@ export function useAuth() {
 
     updateUserRole();
   }, [isBecomingOrganizer]);
+
+useEffect(() => {
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const dateOnboarded = new Date(user.created_at);
+    const dateSignedIn = new Date(user.last_sign_in_at!);
+    const diffInSeconds = (dateSignedIn.getTime() - dateOnboarded.getTime()) / 1000;
+    const isNewUser = diffInSeconds < 5;
+
+    router.push(isNewUser ? "/profile-user-setting" : "/");
+  };
+  checkUser();
+}, [router]);
   return {
     authenticationDetail,
     handleSignUpOnchange,
