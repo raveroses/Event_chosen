@@ -45,17 +45,17 @@ const SignUpcomp = () => {
       </div>
 
       <div className="flex pt-[60px] justify-center gap-[50px]">
-        <div className="apple text-[25px] border border-gray-600 p-3 rounded">
+        <div className="apple text-[25px] border border-gray-600 p-3 rounded cursor-pointer">
           <FaApple />
         </div>
         <div
-          className="google text-[25px] border border-gray-600 p-3 rounded"
+          className="google text-[25px] border border-gray-600 p-3 rounded cursor-pointer"
           onClick={handleGoogleSignIn}
         >
           <FcGoogle />
         </div>
         <div
-          className="Facebook text-[25px] border border-gray-600 p-3 rounded"
+          className="Facebook text-[25px] border border-gray-600 p-3 rounded cursor-pointer"
           onClick={handleFacebook}
         >
           <FaFacebook />

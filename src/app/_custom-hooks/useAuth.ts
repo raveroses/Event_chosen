@@ -1,6 +1,6 @@
 "use client";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { AuthenticatedDetail } from "../_types/types";
 import supabase from "../_supabase/ceateclient";
@@ -29,6 +29,7 @@ export function useAuth() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
+  const pathname = usePathname();
 
   const [insertPayload, setInsertPayLoad] = useState<UserProfile>({
     email: "",
@@ -402,45 +403,14 @@ export function useAuth() {
       password: "",
     });
   };
-  let isUserTrue = false;
-  useEffect(() => {
-    let subscription: { unsubscribe: () => void } | null = null;
 
-    const handleRouteProtection = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        router.push("/sign-up");
-        return;
-      }
-
-      const { data: sub } = supabase.auth.onAuthStateChange(
-        (event, session) => {
-          if (!session) {
-            router.push("/sign-up");
-            return;
-          }
-        },
-      );
-
-      subscription = sub.subscription;
-      isUserTrue = true;
-    };
-
-    handleRouteProtection();
-
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }, [router]);
-
-  console.log("ISUSERTRUE",isUserTrue);
-  
   const [isBecomingOrganizer, setIsBecomingOrganizer] = useState<boolean>(
     () => {
       if (typeof window === "undefined") return false;
 
       try {
-        const stored = localStorage.getItem("isBecomingOrganizerBoolean");
+        const stored =
+          localStorage.getItem("isBecomingOrganizerBoolean") || "false";
         return stored === "true";
       } catch (error) {
         console.error("Failed to read from localStorage:", error);
@@ -480,13 +450,6 @@ export function useAuth() {
         } else {
           setIsBecomingOrganizer(false);
         }
-        // if (isBecomingOrganizer !== isUserRole) {
-        //   setIsBecomingOrganizer(isUserRole);
-        //   localStorage.setItem(
-        //     "isBecomingOrganizerBoolean",
-        //     String(isUserRole)
-        //   );
-        // }
       } catch (e) {
         console.log(e);
       }
@@ -525,7 +488,10 @@ export function useAuth() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        router.replace("/sign-up");
+        return;
+      }
 
       const dateOnboarded = new Date(user.created_at);
       const dateSignedIn = new Date(user.last_sign_in_at!);
@@ -533,10 +499,60 @@ export function useAuth() {
         (dateSignedIn.getTime() - dateOnboarded.getTime()) / 1000;
       const isNewUser = diffInSeconds < 5;
 
-      router.push(isNewUser ? "/profile-user-setting" : "/");
+      router.replace(isNewUser ? "/profile-user-setting" : "/");
     };
     checkUser();
   }, [router]);
+
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+ // ROUTE PROTECTION
+
+  useEffect(() => {
+    let subscription: { unsubscribe: () => void } | null = null;
+
+    const handleRouteProtection = async () => {
+      const { data } = await supabase.auth.getSession();
+
+      if (!data.session) {
+        router.replace("/sign-up");
+        return;
+      }
+
+      // 2. Check organizer permission
+      const isOrganizer =
+        localStorage.getItem("isBecomingOrganizerBoolean") === "true";
+
+      const isCreateEventPage =
+        pathname === "/dashboard/events" || "/dashboard";
+
+      if (isCreateEventPage && !isBecomingOrganizer && !isOrganizer) {
+        router.replace("/");
+        return;
+      }
+
+      // User passed all checks
+      setCheckingAuth(false);
+
+      // 3. Listen for logout
+      const { data: sub } = supabase.auth.onAuthStateChange(
+        (event, session) => {
+          if (!session) {
+            router.replace("/sign-up");
+          }
+        },
+      );
+
+      subscription = sub.subscription;
+    };
+
+    handleRouteProtection();
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [pathname, router, isBecomingOrganizer]);
+
   return {
     authenticationDetail,
     handleSignUpOnchange,
@@ -558,5 +574,6 @@ export function useAuth() {
     handleSignUpNewUserOnchange,
     loginDetail,
     handleLoginOnChange,
+    checkingAuth,
   };
 }

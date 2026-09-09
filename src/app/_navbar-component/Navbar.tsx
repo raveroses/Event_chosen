@@ -103,24 +103,21 @@ const Navbar = () => {
     return () =>
       document.removeEventListener("mousedown", handleOnMobileSearchEventFocus);
   }, []);
-
+console.log("isbaecomingOrganizer",isBecomingOrganizer)
   const navLinks = [
     { href: "/", label: "Find Events" },
-    { href: "/dashboard/events", label: "Create Events" },
+    { href: "/dashboard/events", label: isBecomingOrganizer && "Create Events" },
     { href: "/", label: "Find my tickets" },
-    { href: "/login", label: "Log In" },
-    { href: "/sign-up", label: "Sign Up" },
+    { href: "/logout", label: "Log Out" },
+
+    // { href: "/login", label: "Log In" },
+    // { href: "/sign-up", label: "Sign Up" },
   ];
 
-    const isUserLogIn = [
-    { href: "/", label: "Find Events" },
-    { href: "/dashboard/events", label: "Create Events" },
-    { href: "/", label: "Find my tickets" },
-  ];
 
   const navLinkMap = navLinks.map((navLink, index) => {
     return (
-      <Link href={navLink.href} key={index}>
+      <Link href={navLink.href} key={index} className="font-semibold text-md text-[#f35a18]">
         <li className="">{navLink.label}</li>
       </Link>
     );
@@ -249,7 +246,7 @@ const Navbar = () => {
         </div>
         <ul
           className="md:static absolute top-[75px] right-0 md:w-auto md:h-auto w-[200px] h-[320px] md:bg-transparent  
-          bg-white md:shadow-none shadow-md z-10  flex md:flex-row flex-col gap-10 md:items-center items-left  
+          bg-white md:shadow-none shadow-md z-10  flex md:flex-row flex-col md:gap-5 gap-10 md:items-center items-left  
           justify-left font-medium text-[14px] md:p-auto p-5 md:visible invisible"
         >
           {navLinkMap}
@@ -263,7 +260,7 @@ const Navbar = () => {
               onChange={handleBecomeOrganizerOnchange}
               checked={isBecomingOrganizer}
             />
-            <label htmlFor="organizer">Become an organizer</label>
+            <label htmlFor="organizer" className="font-semibold text-md text-[#f35a18]">Become an organizer</label>
           </form>
         )}
       </div>
