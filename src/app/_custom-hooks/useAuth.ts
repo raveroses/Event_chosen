@@ -123,7 +123,7 @@ export function useAuth() {
         toast.success("Redirecting to login page");
         router.push("/login");
       } else {
-        router.push("/sign-up");
+        router.replace("/sign-up");
       }
     } catch (e: unknown) {
       if (e instanceof Error) {
@@ -188,10 +188,10 @@ export function useAuth() {
 
       if (!isExistedUser) {
         toast.success("Redirctiong to profile category");
-        router.push("/profile-user-setting");
+        router.replace("/signup");
       } else {
         toast.success("successfully login");
-        router.push("/");
+        router.push("/profile-user-setting");
       }
     } catch (e: unknown) {
       if (e instanceof Error) {
