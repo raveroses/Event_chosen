@@ -33,8 +33,8 @@ export function useEventData() {
         const { data, error } = duplicateRes;
         const { data: eventDefault, error: eventDefaultError } = defaultRes;
 
-        console.log("Fetched data from eventchosen_duplicate:", data);
-        console.log("Fetched data from eventchosen:", eventDefault);
+        // console.log("Fetched data from eventchosen_duplicate:", data);
+        // console.log("Fetched data from eventchosen:", eventDefault);
 
         if (error || eventDefaultError) {
           const message = error?.message || eventDefaultError?.message;
@@ -45,10 +45,10 @@ export function useEventData() {
 
         setAllEvents([...(data || []), ...(eventDefault || [])]);
      
-        console.log("allEvents set to:", [
-          ...(data || []),
-          ...(eventDefault || []),
-        ]);
+        // console.log("allEvents set to:", [
+        //   ...(data || []),
+        //   ...(eventDefault || []),
+        // ]);
       } catch (e: unknown) {
         if (e instanceof Error) {
           toast.error(e.message);
@@ -65,7 +65,7 @@ export function useEventData() {
         setEventFilter([...allEvents]);
     }
 }, [allEvents]);
-  console.log("FIlter", eventFilter);
+  // console.log("FIlter", eventFilter);
   const handleEventFilter = (eachEventDay: string) => {
     const eventDayLowercase = eachEventDay.toLowerCase();
     setEventDays(eventDayLowercase);

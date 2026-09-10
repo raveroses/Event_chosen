@@ -31,8 +31,8 @@ const LocationSearching = () => {
   };
   // const totalNumberOfEvents = allEvents.slice(0, numberEventDisplay);
   const totalNumberOfEvents = eventFilter.slice(0, numberEventDisplay);
-  console.log("totalNumberOfEvnet", totalNumberOfEvents);
-  console.log("eventFilter", eventFilter);
+  // console.log("totalNumberOfEvnet", totalNumberOfEvents);
+  // console.log("eventFilter", eventFilter);
 
   return (
     <section className="md:p-0 px-3">

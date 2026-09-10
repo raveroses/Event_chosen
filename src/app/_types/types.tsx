@@ -112,6 +112,8 @@ export type userChoice = {
 export type UserProfile = {
   roles: string;
   email: string;
+  id: string;
+  onboarding_completed: boolean;
 };
 
 export type WelcomeEmail = {

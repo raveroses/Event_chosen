@@ -34,6 +34,8 @@ export function useAuth() {
   const [insertPayload, setInsertPayLoad] = useState<UserProfile>({
     email: "",
     roles: "",
+    id: "",
+    onboarding_completed: false,
   });
 
   const [authenticationDetail, setAuthenticationDetail] =
@@ -226,7 +228,9 @@ export function useAuth() {
 
       const payload: UserProfile = {
         email: session.user.email ?? "",
+        id: session.user.id ?? "",
         roles: rolesChoice.trim(),
+        onboarding_completed: true,
       };
 
       setInsertPayLoad(payload);
@@ -265,7 +269,7 @@ export function useAuth() {
       await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/profile-user-setting`,
         },
       });
     } catch (e: unknown) {
@@ -458,7 +462,7 @@ export function useAuth() {
     fetchUserRole();
   }, []);
 
-  // console.log("isbecoming organizer", isBecomingOrganizer);
+  console.log("isbecoming organizer", isBecomingOrganizer);
 
   useEffect(() => {
     const updateUserRole = async () => {
@@ -475,6 +479,7 @@ export function useAuth() {
 
       if (error) {
         console.error("Error updating user role:", error);
+        return;
       } else {
         console.log(`User role updated to ${newRole}`);
       }
@@ -488,25 +493,38 @@ export function useAuth() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+
       if (!user) {
         router.replace("/sign-up");
         return;
       }
 
-      const dateOnboarded = new Date(user.created_at);
-      const dateSignedIn = new Date(user.last_sign_in_at!);
-      const diffInSeconds =
-        (dateSignedIn.getTime() - dateOnboarded.getTime()) / 1000;
-      const isNewUser = diffInSeconds < 5;
+      const { data: userData, error } = await supabase
+        .from("users")
+        .select("onboarding_completed")
+        .eq("id", user.id)
+        .single();
 
-      router.replace(isNewUser ? "/profile-user-setting" : "/");
+      if (error) {
+        console.error("Error fetching onboarding status:", error);
+        return;
+      }
+
+      console.log("userData:", userData);
+
+      if (userData?.onboarding_completed === false) {
+        router.replace("/profile-user-setting");
+      } else {
+        router.replace("/");
+      }
     };
+
     checkUser();
   }, [router]);
 
   const [checkingAuth, setCheckingAuth] = useState(true);
 
- // ROUTE PROTECTION
+  // ROUTE PROTECTION
 
   useEffect(() => {
     let subscription: { unsubscribe: () => void } | null = null;
@@ -524,7 +542,7 @@ export function useAuth() {
         localStorage.getItem("isBecomingOrganizerBoolean") === "true";
 
       const isCreateEventPage =
-        pathname === "/dashboard/events" || "/dashboard";
+        pathname?.startsWith("/dashboard") || pathname === "/dashboard/events";
 
       if (isCreateEventPage && !isBecomingOrganizer && !isOrganizer) {
         router.replace("/");

@@ -45,7 +45,7 @@ const EventListingLandingPage = () => {
     handleUserEventList,
   } = useAppContext();
 
-  console.log("FILTERING EVENT", filteringEvent);
+  // console.log("FILTERING EVENT", filteringEvent);
 
   const [isCalendarClose, setIsCalendarClose] = useState<boolean>(false);
   const handleIsOpenCalendar = (e: React.MouseEvent<HTMLDivElement>) => {

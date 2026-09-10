@@ -103,7 +103,7 @@ const Navbar = () => {
     return () =>
       document.removeEventListener("mousedown", handleOnMobileSearchEventFocus);
   }, []);
-console.log("isbaecomingOrganizer",isBecomingOrganizer)
+// console.log("isbaecomingOrganizer",isBecomingOrganizer)
   const navLinks = [
     { href: "/", label: "Find Events" },
     { href: "/dashboard/events", label: isBecomingOrganizer && "Create Events" },

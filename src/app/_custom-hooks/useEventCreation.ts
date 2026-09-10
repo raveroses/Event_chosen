@@ -274,7 +274,7 @@ export function useEventCreation() {
       setLoading(true);
       await new Promise((r) => setTimeout(r, 1000));
       try {
-        console.log("Eventto", eachUserEventCreationList);
+        // console.log("Eventto", eachUserEventCreationList);
         // const check = eachUserEventCreationList.filter((event) => {
         //   const dateConversion = new Date(event.eventDate);
         //   const dateConversionDate = dateConversion.getDate();
@@ -299,7 +299,7 @@ export function useEventCreation() {
           return eventDate === settingDate;
         });
         setFilteringEvent(check);
-        console.log("CHECK=>", check);
+        // console.log("CHECK=>", check);
       } catch (e: unknown) {
         if (e instanceof Error) {
           console.log(e.message);
