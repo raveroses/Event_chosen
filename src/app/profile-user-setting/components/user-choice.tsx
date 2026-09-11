@@ -30,7 +30,7 @@ const UserChoice = () => {
             {userChoiceList.map((Item, index) => {
               return (
                 <div
-                  className="non-eventOrganizer bg-white shadow w-[350px] h-[350px] flex flex-col justify-center items-center text-center "
+                  className="non-eventOrganizer bg-white shadow w-[350px] h-[350px] flex flex-col justify-center items-center text-center cursor-pointer pointer-events-auto"
                   key={index}
                   onClick={() => handleUserChoice(Item.heading)}
                 >

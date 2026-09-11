@@ -262,16 +262,19 @@ export function useAuth() {
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1000);
-    });
+
     try {
-      await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/profile-user-setting`,
+          redirectTo: `${window.location.origin}/callback`,
         },
       });
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
     } catch (e: unknown) {
       if (e instanceof Error) {
         toast.error(e.message);
@@ -488,6 +491,23 @@ export function useAuth() {
     updateUserRole();
   }, [isBecomingOrganizer]);
 
+  const redirectUser = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("users")
+      .select("onboarding_completed")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    if (data.onboarding_completed) {
+      router.replace("/");
+    }
+  };
+
   useEffect(() => {
     const checkUser = async () => {
       const {
@@ -499,24 +519,7 @@ export function useAuth() {
         return;
       }
 
-      const { data: userData, error } = await supabase
-        .from("users")
-        .select("onboarding_completed")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching onboarding status:", error);
-        return;
-      }
-
-      console.log("userData:", userData);
-
-      if (userData?.onboarding_completed === false) {
-        router.replace("/profile-user-setting");
-      } else {
-        router.replace("/");
-      }
+      await redirectUser(user.id);
     };
 
     checkUser();
