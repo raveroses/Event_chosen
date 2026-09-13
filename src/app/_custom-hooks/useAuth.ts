@@ -52,9 +52,12 @@ export function useAuth() {
 
   const handleSignUpOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setWelcomeEmail((prev) => ({ ...prev, [name]: value }));
-  };
 
+    setWelcomeEmail((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
   const handleSignUpFormContinuation = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
@@ -71,7 +74,10 @@ export function useAuth() {
     }
 
     await new Promise((r) => setTimeout(r, 1000));
-    authenticationDetail.signUpEmail = welcomeEmail.email;
+    setAuthenticationDetail((prev) => ({
+      ...prev,
+      signUpEmail: welcomeEmail.email,
+    }));
     setWelcomeEmail({
       email: "",
     });
@@ -125,6 +131,7 @@ export function useAuth() {
       } else {
         router.replace("/sign-up");
       }
+
     } catch (e: unknown) {
       if (e instanceof Error) {
         toast.error(e.message);
@@ -243,7 +250,7 @@ export function useAuth() {
         .select();
 
       if (insertError) {
-        console.error("Insert error:", insertError);
+        console.log("Insert error:", insertError);
         return;
       }
       console.log("Inserted user:", user);
@@ -267,7 +274,7 @@ export function useAuth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/callback`,
+          redirectTo: `${window.location.origin}/profile-user-setting`,
         },
       });
 
@@ -420,7 +427,7 @@ export function useAuth() {
           localStorage.getItem("isBecomingOrganizerBoolean") || "false";
         return stored === "true";
       } catch (error) {
-        console.error("Failed to read from localStorage:", error);
+        console.log("Failed to read from localStorage:", error);
         return false;
       }
     },
@@ -443,7 +450,7 @@ export function useAuth() {
           .single();
         console.log("userData", userData);
         if (error) {
-          console.error("Error fetching user role:", error);
+          console.log("Error fetching user role:", error);
           return;
         }
         const isUserRole = userData?.roles === "organizer";
@@ -481,7 +488,7 @@ export function useAuth() {
         .eq("id", user.id);
 
       if (error) {
-        console.error("Error updating user role:", error);
+        console.log("Error updating user role:", error);
         return;
       } else {
         console.log(`User role updated to ${newRole}`);
@@ -499,7 +506,7 @@ export function useAuth() {
       .single();
 
     if (error) {
-      console.error(error);
+      console.log(error);
       return;
     }
 
@@ -510,9 +517,14 @@ export function useAuth() {
 
   useEffect(() => {
     const checkUser = async () => {
+      if (pathname === "/user-detail") {
+        return;
+      }
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
+
 
       if (!user) {
         router.replace("/sign-up");
@@ -523,57 +535,52 @@ export function useAuth() {
     };
 
     checkUser();
-  }, [router]);
+  }, [router, pathname]);
 
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   // ROUTE PROTECTION
 
-  useEffect(() => {
-    let subscription: { unsubscribe: () => void } | null = null;
+ useEffect(() => {
+  let subscription: { unsubscribe: () => void } | null = null;
 
-    const handleRouteProtection = async () => {
-      const { data } = await supabase.auth.getSession();
+  const handleRouteProtection = async () => {
 
-      if (!data.session) {
-        router.replace("/sign-up");
-        return;
-      }
-
-      // 2. Check organizer permission
-      const isOrganizer =
-        localStorage.getItem("isBecomingOrganizerBoolean") === "true";
-
-      const isCreateEventPage =
-        pathname?.startsWith("/dashboard") || pathname === "/dashboard/events";
-
-      if (isCreateEventPage && !isBecomingOrganizer && !isOrganizer) {
-        router.replace("/");
-        return;
-      }
-
-      // User passed all checks
+    // Signup page — no session required yet
+    if (pathname === "/sign-up" || pathname === "/user-detail") {
       setCheckingAuth(false);
+      return;
+    }
 
-      // 3. Listen for logout
-      const { data: sub } = supabase.auth.onAuthStateChange(
-        (event, session) => {
-          if (!session) {
-            router.replace("/sign-up");
-          }
-        },
-      );
+    const { data } = await supabase.auth.getSession();
 
-      subscription = sub.subscription;
-    };
+    if (!data.session) {
+      router.replace("/sign-up");
+      return;
+    }
 
-    handleRouteProtection();
+    // rest of your protection...
+    setCheckingAuth(false);
 
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }, [pathname, router, isBecomingOrganizer]);
+    const { data: sub } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (!session) {
+          router.replace("/sign-up");
+        }
+      }
+    );
 
+    subscription = sub.subscription;
+  };
+
+  handleRouteProtection();
+
+  return () => {
+    subscription?.unsubscribe();
+  };
+}, [pathname, router, isBecomingOrganizer]);
+
+  console.log("Welcome Email", welcomeEmail.email);
   return {
     authenticationDetail,
     handleSignUpOnchange,

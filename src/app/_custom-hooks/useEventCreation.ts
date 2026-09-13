@@ -55,7 +55,6 @@ export function useEventCreation() {
     }));
   };
 
-
   const handleEventCreationValidation = (): boolean => {
     if (
       !eventDetailCreation.eventTitle.trim() ||
@@ -122,7 +121,7 @@ export function useEventCreation() {
 
       if (userSessionError || !session?.user?.id) {
         toast.error("Authentication error. Please log in again.");
-        console.error("Session error:", userSessionError);
+        console.log("Session error:", userSessionError);
         return;
       }
 
@@ -134,7 +133,7 @@ export function useEventCreation() {
 
       if (userError) {
         toast.error("Failed to verify user permissions");
-        console.error("User fetch error:", userError);
+        console.log("User fetch error:", userError);
         return;
       }
 
@@ -183,7 +182,7 @@ export function useEventCreation() {
         eventImage: "",
       });
     } catch (error: unknown) {
-      console.error("Unexpected error during event creation:", error);
+      console.log("Unexpected error during event creation:", error);
       toast.error("An unexpected error occurred. Please try again.");
     }
   };
@@ -207,7 +206,7 @@ export function useEventCreation() {
         .select("*");
 
       if (error) {
-        console.error("Error fetching users:", error);
+        console.log("Error fetching users:", error);
         return;
       }
       console.log("Fetched data:", data);
@@ -221,7 +220,7 @@ export function useEventCreation() {
         }
       }
     } catch (err) {
-      console.error("Unexpected error:", err);
+      console.log("Unexpected error:", err);
     }
   };
 

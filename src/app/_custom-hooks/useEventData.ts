@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+// import { createClient } from "@supabase/supabase-js";
 import { Event, Search } from "../_types/types";
 import { toast } from "react-toastify";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_API_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import supabase from "../_supabase/ceateclient";
+// const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+// const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_API_KEY!;
+// const supabase = createClient(supabaseUrl, supabaseKey);
 
 export function useEventData() {
   // const [eventData, setEventData] = useState<Event[]>([]);
@@ -38,13 +38,13 @@ export function useEventData() {
 
         if (error || eventDefaultError) {
           const message = error?.message || eventDefaultError?.message;
-          console.error("Supabase fetch error:", message);
+          console.log("Supabase fetch error:", message);
           toast.error(message);
           return;
         }
 
         setAllEvents([...(data || []), ...(eventDefault || [])]);
-     
+
         // console.log("allEvents set to:", [
         //   ...(data || []),
         //   ...(eventDefault || []),
@@ -59,12 +59,11 @@ export function useEventData() {
     fetchingEvent();
   }, []);
 
-
   useEffect(() => {
-    if(allEvents.length > 0) {
-        setEventFilter([...allEvents]);
+    if (allEvents.length > 0) {
+      setEventFilter([...allEvents]);
     }
-}, [allEvents]);
+  }, [allEvents]);
   // console.log("FIlter", eventFilter);
   const handleEventFilter = (eachEventDay: string) => {
     const eventDayLowercase = eachEventDay.toLowerCase();
@@ -232,13 +231,14 @@ export function useEventData() {
   //   }
   // }, [eventLocation, allEvents]);
   // }, [eventLocation, allEvents, eventInputSearch]);
-useEffect(() => {
-    if (!eventLocation.trim() ||
-        eventLocation.toLowerCase().trim() === "Use my current location"
+  useEffect(() => {
+    if (
+      !eventLocation.trim() ||
+      eventLocation.toLowerCase().trim() === "Use my current location"
     ) {
       // ✅ Only reset if no day filter is active
-      if(eventDays === "all") {
-          setEventFilter([...allEvents]);
+      if (eventDays === "all") {
+        setEventFilter([...allEvents]);
       }
       // if a day filter is active, do nothing — leave it alone
     } else {
@@ -250,7 +250,7 @@ useEffect(() => {
       });
       setEventFilter(filtered);
     }
-}, [eventLocation, allEvents]);
+  }, [eventLocation, allEvents]);
 
   return {
     // eventData,
