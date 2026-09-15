@@ -243,11 +243,14 @@ export function useAuth() {
 
       console.log("PAYLOAD:", payload);
 
+      // const { data: user, error: insertError } = await supabase
+      //   .from("users")
+      //   .insert(payload)
+      //   .select();
       const { data: user, error: insertError } = await supabase
         .from("users")
-        .insert(payload)
+        .upsert(payload, { onConflict: "id" })
         .select();
-
       if (insertError) {
         console.log("Insert error:", insertError);
         return;
@@ -431,7 +434,9 @@ export function useAuth() {
       }
     },
   );
+  const isUserToggleRef = React.useRef(false);
   const handleBecomeOrganizerOnchange = (e: ChangeEvent<HTMLInputElement>) => {
+    isUserToggleRef.current = true;
     setIsBecomingOrganizer(e.target.checked);
   };
 
@@ -475,6 +480,8 @@ export function useAuth() {
 
   useEffect(() => {
     const updateUserRole = async () => {
+      if (!isUserToggleRef.current) return; // skip: this came from the fetch, not a user action
+      isUserToggleRef.current = false;
       const { data: session } = await supabase.auth.getSession();
       const user = session.session?.user;
       if (!user) return;
@@ -497,26 +504,25 @@ export function useAuth() {
     updateUserRole();
   }, [isBecomingOrganizer]);
 
-  const redirectUser = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("users")
-      .select("onboarding_completed")
-      .eq("id", userId)
-      .single();
+  // const redirectUser = async (userId: string) => {
+  //   const { data, error } = await supabase
+  //     .from("users")
+  //     .select("onboarding_completed")
+  //     .eq("id", userId)
+  //     .single();
 
-    if (error) {
-      console.log(error);
-      return;
-    }
+  //   if (error) {
+  //     console.log(error);
+  //     return;
+  //   }
 
-    if (data.onboarding_completed) {
-      router.replace("/");
-    }
-  };
+  //   if (data.onboarding_completed) {
+  //     router.replace("/");
+  //   }
+  // };
 
   useEffect(() => {
     const checkUser = async () => {
-
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -526,7 +532,7 @@ export function useAuth() {
         return;
       }
 
-      await redirectUser(user.id);
+      // await redirectUser(user.id);
     };
 
     checkUser();
@@ -566,6 +572,16 @@ export function useAuth() {
         router.replace("/");
         return;
       }
+      console.log(
+        "isAccessible",
+        pathname.startsWith("/dashboard") &&
+          userData?.roles !== "organizer" &&
+          data.session,
+      );
+
+      console.log("ispathname", pathname.startsWith("/dashboard"));
+      console.log("userData", userData);
+      console.log("datasession", data.session);
 
       // rest of your protection...
       setCheckingAuth(false);
