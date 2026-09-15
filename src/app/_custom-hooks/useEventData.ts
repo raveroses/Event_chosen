@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 // import { createClient } from "@supabase/supabase-js";
 import { Event, Search } from "../_types/types";
 import { toast } from "react-toastify";
-import supabase from "../_supabase/ceateclient";
+import createClient from "@/lib/supabase/client";
 // const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 // const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_API_KEY!;
 // const supabase = createClient(supabaseUrl, supabaseKey);
@@ -20,7 +20,7 @@ export function useEventData() {
   const [eventFilter, setEventFilter] = useState<Event[]>([]);
   // const [eventInputSearch, setEventInputSearch] = useState<Event[]>([]);
   const [eventDays, setEventDays] = useState<string>("all");
-
+const supabase= createClient()
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   useEffect(() => {
     const fetchingEvent = async () => {

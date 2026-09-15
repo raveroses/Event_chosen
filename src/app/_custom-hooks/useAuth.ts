@@ -3,7 +3,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { AuthenticatedDetail } from "../_types/types";
-import supabase from "../_supabase/ceateclient";
+import createClient from "@/lib/supabase/client";
 import { UserProfile } from "../_types/types";
 import { userChoice } from "../_types/types";
 import { WelcomeEmail } from "../_types/types";
@@ -30,7 +30,7 @@ export function useAuth() {
 
   const router = useRouter();
   const pathname = usePathname();
-
+  const supabase = createClient();
   const [insertPayload, setInsertPayLoad] = useState<UserProfile>({
     email: "",
     roles: "",
@@ -131,7 +131,6 @@ export function useAuth() {
       } else {
         router.replace("/sign-up");
       }
-
     } catch (e: unknown) {
       if (e instanceof Error) {
         toast.error(e.message);
@@ -274,7 +273,7 @@ export function useAuth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/profile-user-setting`,
+          redirectTo: `${window.location.origin}/callback`,
         },
       });
 
@@ -517,14 +516,10 @@ export function useAuth() {
 
   useEffect(() => {
     const checkUser = async () => {
-      if (pathname === "/user-detail") {
-        return;
-      }
 
       const {
         data: { user },
       } = await supabase.auth.getUser();
-
 
       if (!user) {
         router.replace("/sign-up");
@@ -541,46 +536,48 @@ export function useAuth() {
 
   // ROUTE PROTECTION
 
- useEffect(() => {
-  let subscription: { unsubscribe: () => void } | null = null;
-
-  const handleRouteProtection = async () => {
-
-    // Signup page — no session required yet
-    if (pathname === "/sign-up" || pathname === "/user-detail") {
-      setCheckingAuth(false);
-      return;
-    }
-
-    const { data } = await supabase.auth.getSession();
-
-    if (!data.session) {
-      router.replace("/sign-up");
-      return;
-    }
-
-    // rest of your protection...
-    setCheckingAuth(false);
-
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (!session) {
-          router.replace("/sign-up");
-        }
+  useEffect(() => {
+    // Set up the listener synchronously, first thing — no async delay before this exists
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        router.replace("/sign-up");
       }
-    );
+    });
 
-    subscription = sub.subscription;
-  };
+    const handleRouteProtection = async () => {
+      const { data } = await supabase.auth.getSession();
 
-  handleRouteProtection();
+      if (!data.session) {
+        router.replace("/sign-up");
+        return;
+      }
 
-  return () => {
-    subscription?.unsubscribe();
-  };
-}, [pathname, router, isBecomingOrganizer]);
+      const { data: userData, error } = await supabase
+        .from("users")
+        .select("roles")
+        .eq("id", data.session.user.id)
+        .maybeSingle(); // was .single() — this now survives a missing row instead of throwing
 
-  console.log("Welcome Email", welcomeEmail.email);
+      if (
+        pathname.startsWith("/dashboard") &&
+        userData?.roles !== "organizer" &&
+        data.session
+      ) {
+        router.replace("/");
+        return;
+      }
+
+      // rest of your protection...
+      setCheckingAuth(false);
+    };
+
+    handleRouteProtection();
+
+    return () => {
+      sub.subscription.unsubscribe(); // now always the correct, current listener
+    };
+  }, [pathname, router, isBecomingOrganizer]);
+
   return {
     authenticationDetail,
     handleSignUpOnchange,

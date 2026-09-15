@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, ChangeEvent } from "react";
-import supabase from "../_supabase/ceateclient";
+import createClient from "@/lib/supabase/client";
 import { Event } from "../_types/types";
 import { toast } from "react-toastify";
 export function useEventCreation() {
@@ -26,6 +26,8 @@ export function useEventCreation() {
   const [eachUserEventCreationList, setEachUserEventCreationList] = useState<
     Event[]
   >([]);
+
+  const supabase= createClient()
   const dateOnSelect = (date: Date) => {
     setDate(date);
     setOpen(false);
