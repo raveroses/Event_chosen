@@ -531,39 +531,39 @@ export function useAuth() {
   //   }
   // };
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+  // useEffect(() => {
+  //   const checkUser = async () => {
+  //     const {
+  //       data: { user },
+  //     } = await supabase.auth.getUser();
 
-      if (!user) {
-        router.replace("/sign-up");
-        return;
-      }
+  //     if (!user) {
+  //       router.replace("/sign-up");
+  //       return;
+  //     }
 
-      // await redirectUser(user.id);
-    };
+  //     // await redirectUser(user.id);
+  //   };
 
-    checkUser();
-  }, [router, pathname]);
+  //   checkUser();
+  // }, [router, pathname]);
 
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   // ROUTE PROTECTION
 
   useEffect(() => {
-    // Set up the listener synchronously, first thing — no async delay before this exists
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        router.replace("/sign-up");
-      }
-    });
+
 
     const handleRouteProtection = async () => {
       const { data } = await supabase.auth.getSession();
 
+      const publicPaths = ["/user-detail", "/login", "/sign-up"];
+
       if (!data.session) {
+        if (publicPaths.includes(pathname)) {
+          return;
+        }
         router.replace("/sign-up");
         return;
       }
@@ -599,9 +599,7 @@ export function useAuth() {
 
     handleRouteProtection();
 
-    return () => {
-      sub.subscription.unsubscribe(); // now always the correct, current listener
-    };
+  
   }, [pathname, router, isBecomingOrganizer]);
 
   return {
