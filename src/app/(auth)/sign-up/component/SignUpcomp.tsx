@@ -30,7 +30,7 @@ const SignUpcomp = () => {
           className="border w-full  p-[15px]"
           onChange={handleSignUpOnchange}
         />
-        <button className="w-full  text-white bg-[#d1410c] p-2 rounded my-[30px] ">
+        <button className="w-full text-white bg-[#d1410c] p-2 rounded my-[30px] cursor-pointer hover:bg-red-400 transition-all duration-[1000ms]">
           Continue
         </button>
       </form>

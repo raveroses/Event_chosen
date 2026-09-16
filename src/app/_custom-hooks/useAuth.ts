@@ -192,12 +192,22 @@ export function useAuth() {
         );
       });
 
-      if (!isExistedUser) {
+      if (!isExistedUser && session.user) {
         toast.success("Redirctiong to profile category");
-        router.replace("/signup");
-      } else {
-        toast.success("successfully login");
         router.push("/profile-user-setting");
+        return;
+      }
+
+      if (isExistedUser && session.user) {
+        toast.success("successfully login");
+        router.push("/");
+        return;
+      }
+
+      if (!isExistedUser && !session.user) {
+        toast.error("Please, sign up");
+        router.replace("/sign-up");
+        return;
       }
     } catch (e: unknown) {
       if (e instanceof Error) {
