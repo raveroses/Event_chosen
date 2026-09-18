@@ -60,7 +60,6 @@ export type Context = {
   ) => Promise<void>;
   signUpNewUser: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   signInWithEmail: (e: FormEvent<HTMLFormElement>) => Promise<void>;
-  handleOneTime: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   handeResetPassword: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   handlePasswordChangerInput: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   userChoiceList: userChoice[];

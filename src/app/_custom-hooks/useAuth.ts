@@ -72,7 +72,6 @@ export function useAuth() {
       setLoading(false);
       return;
     }
-
     await new Promise((r) => setTimeout(r, 1000));
     setAuthenticationDetail((prev) => ({
       ...prev,
@@ -328,45 +327,7 @@ export function useAuth() {
     }
   };
 
-  const handleOneTime = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1000);
-    });
-    try {
-      const { data, error } = await supabase.auth.signInWithOtp({
-        email: authenticationDetail.signUpEmail,
-        options: {
-          shouldCreateUser: true,
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
 
-      if (data.session) {
-        toast.success("Please, check your mail");
-      } else {
-        if (error instanceof AuthError) {
-          toast.error(error.message);
-        }
-      }
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        toast.error(e.message);
-      } else {
-        toast.error("An unexpected error occurred");
-      }
-    } finally {
-      setLoading(false);
-    }
-
-    setAuthenticationDetail({
-      signUpEmail: "",
-      firstName: "",
-      lastName: "",
-      password: "",
-    });
-  };
 
   const handeResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -553,12 +514,10 @@ export function useAuth() {
   // ROUTE PROTECTION
 
   useEffect(() => {
-
-
     const handleRouteProtection = async () => {
       const { data } = await supabase.auth.getSession();
 
-      const publicPaths = ["/user-detail", "/login", "/sign-up"];
+      const publicPaths = ["/user-detail", "/login", "/sign-up","/one-time"];
 
       if (!data.session) {
         if (publicPaths.includes(pathname)) {
@@ -598,8 +557,6 @@ export function useAuth() {
     };
 
     handleRouteProtection();
-
-  
   }, [pathname, router, isBecomingOrganizer]);
 
   return {
@@ -610,7 +567,6 @@ export function useAuth() {
     signInWithEmail,
     handleGoogleSignIn,
     handleFacebook,
-    handleOneTime,
     handeResetPassword,
     handlePasswordChangerInput,
     userChoiceList,

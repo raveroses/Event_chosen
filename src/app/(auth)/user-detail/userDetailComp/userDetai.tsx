@@ -20,6 +20,8 @@ const UserDetail = () => {
   const handleIsPasswordHidden = () => {
     setIsHiddenPassword((prev) => !prev);
   };
+  const [isFocus, setIsFocus] = useState<boolean>(false)
+
   return (
     <section className="absolute md:top-[200px] top-[0px] md:left-[700px] bg-white md:w-[420px] w-full md:h-auto h-[750px] opacity-75 md:px-[35px] px-[20px] md:py-[50px] py-[100px] z-30 ">
       <DesktopLogo />
@@ -54,7 +56,7 @@ const UserDetail = () => {
           placeholder="Last name"
         />
 
-        <div className="flex justify-between items-center border-2 w-full p-[12px] rounded ">
+        <div className={`flex justify-between items-center border-2 w-full p-[12px] rounded ${isFocus ? "border-red-400" : "border"}`}>
           <input
             type={isHiddenPassword ? "text" : "password"}
             name="password"
@@ -63,6 +65,8 @@ const UserDetail = () => {
             required
             className="w-full placeholder:text-[13px] font-medium  outline-none border-none"
             placeholder="Enter password"
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
           />
 
           <div className="text-xl cursor-pointer" onClick={handleIsPasswordHidden}>
@@ -76,6 +80,11 @@ const UserDetail = () => {
         <button className="w-full text-white bg-[#d1410c] p-[13px] rounded my-[5px] text-[13px] font-bold cursor-pointer">
           Submit
         </button>
+        <Link href={"/one-time"}>
+          <button className="w-full bg-transparent p-[13px] rounded my-[3px] border border-gray-300 text-[13px] font-bold cursor-pointer">
+            Sign in with one-time code
+          </button>
+        </Link>
         <Link href="/login" className="text-center text-[#3659e3] text-sm inline-block cursor-pinter hover:underline italic transition-all duration-[2000ms]">
           Already have an account, Login
         </Link>
