@@ -3,9 +3,14 @@ import { MdCalendarMonth } from "react-icons/md";
 import Image from "next/image";
 import { useState } from "react";
 import useAppContext from "@/app/_custom-hooks/useAppContext";
+import { useRouter } from "next/navigation";
 const supabaseLoader = ({ src }: { src: string }) => {
   return src;
 };
+
+
+
+
 
 const LocationSearching = () => {
   const [eventSchedule] = useState<string[]>(["All", "Today", "This weekend"]);
@@ -34,6 +39,19 @@ const LocationSearching = () => {
   // console.log("totalNumberOfEvnet", totalNumberOfEvents);
   // console.log("eventFilter", eventFilter);
 
+  const origin = window.location.origin
+  const router = useRouter()
+
+
+  function slugify(title: string) {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
   return (
     <section className="md:p-0 px-3">
       <div
@@ -49,11 +67,10 @@ const LocationSearching = () => {
         {eventSchedule.map((eventDay, index) => {
           return (
             <div
-              className={` text-[14px] pt-5 cursor-pointer ${
-                eventDay.toLowerCase() === eventDays
-                  ? "border-b-2 border-[#3659e3]"
-                  : "border-none"
-              }`}
+              className={` text-[14px] pt-5 cursor-pointer ${eventDay.toLowerCase() === eventDays
+                ? "border-b-2 border-[#3659e3]"
+                : "border-none"
+                }`}
               key={index}
               onClick={() => handleEventFilter(eventDay)}
             >
@@ -69,7 +86,7 @@ const LocationSearching = () => {
             // eventFilter.length > 0 || eventInputSearch.length > 0
             // eventFilter.length > 0 || allEvents.length ? "hidden" : "block"
             eventFilter.length > 0 ? "hidden" : "block"
-          }`}
+            }`}
         >
           <MdCalendarMonth className="text-[50px] m-auto " />
 
@@ -85,10 +102,10 @@ const LocationSearching = () => {
           {totalNumberOfEvents.map((event, index) => {
             return (
               <div
-                className={`card-cover hover:shadow-lg transition-all duration-200 cursor-pointer md:w-[300px] w-full h-auto pb-[10px] rounded-xl ${
-                  allEvents.length > 0 ? "block" : "hidden"
-                }`}
+                className={`card-cover hover:shadow-lg transition-all duration-200 cursor-pointer md:w-[300px] w-full h-auto pb-[10px] rounded-xl ${allEvents.length > 0 ? "block" : "hidden"
+                  }`}
                 key={index}
+                onClick={() => router.push(`/${slugify(event.eventTitle)}`)}
               >
                 <div className="relative md:w-[300px] md:h-[180px] w-full h-[200px] min-w-full">
                   <Image
