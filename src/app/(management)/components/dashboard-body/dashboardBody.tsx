@@ -12,6 +12,16 @@ const DashboardFirstBody = () => {
       pcontent:
         "Add all of your event details and let attendees know what to expect",
     },
+    {
+      heading: "Add tickets",
+      pcontent:
+        "Add all of your event details and let attendees know what to expect",
+    },
+    {
+      heading: "Publish",
+      pcontent:
+        "Add all of your event details and let attendees know what to expect",
+    },
   ]);
   const { eventDetailCreation } = useAppContext();
   const router = useRouter();
@@ -26,7 +36,7 @@ const DashboardFirstBody = () => {
         <p>Back to events</p>
       </div>
 
-      <div className="relative bg-white rounded-xl shadow w-[275px] h-[240px] my-[35px] ">
+      <div className="relative bg-white rounded-xl shadow w-[250px] h-[220px] my-[35px] ">
         <Image
           src={"/images/auto-create-floating-card-splatter1.png"}
           alt="image part"
@@ -65,9 +75,8 @@ const DashboardFirstBody = () => {
           {inputContent.map((item, index) => {
             return (
               <div
-                className={` flex gap-[10px] items-start p-[5px] ${
-                  item.pcontent ? "bg-gray-100" : "bg-transparent"
-                }`}
+                className={` flex gap-[10px] items-start p-[5px] ${item.pcontent ? "bg-gray-100" : "bg-transparent"
+                  }`}
                 key={index}
               >
                 <div className=" border-2 border-[#3659e3] rounded-full p-1 flex justify-center">

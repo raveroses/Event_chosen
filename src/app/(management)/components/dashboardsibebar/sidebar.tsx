@@ -26,14 +26,13 @@ const Sidebar = () => {
   ]);
 
   const pathname = usePathname();
-  console.log("pathname", pathname);
 
   const { menuDisplay } = useAppContext();
 
   return (
     <section
       className={`md:flex md:flex-col md:static absolute top-[99px] gap-[40px] border-r border-gray-200 px-[10px] py-[40px] md:bg-gray-100 bg-white
-       w-full h-[400px] md:h-[600px] z-20 ${menuDisplay ? "grid grid-cols-3 " : "hidden"
+       w-full h-[400px] md:h-[700px] z-20 ${menuDisplay ? "grid grid-cols-3 " : "hidden"
         }`}
     >
       {SidebarListing.map((sidebarItem, index) => {

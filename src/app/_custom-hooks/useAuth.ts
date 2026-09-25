@@ -447,7 +447,6 @@ export function useAuth() {
     fetchUserRole();
   }, []);
 
-  console.log("isbecoming organizer", isBecomingOrganizer);
 
   useEffect(() => {
     const updateUserRole = async () => {
