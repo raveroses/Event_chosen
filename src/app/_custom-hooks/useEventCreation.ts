@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, ChangeEvent } from "react";
 import createClient from "@/lib/supabase/client";
 import { Event } from "../_types/types";
 import { toast } from "react-toastify";
+import { Saved } from "../_types/types";
+
 export function useEventCreation() {
   const [eventDetailCreation, setEventDetailCreation] = useState<Event>({
     eventTitle: "",
@@ -22,12 +24,75 @@ export function useEventCreation() {
     useState<string>("Venue");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const imageRef = useRef<HTMLInputElement | null>(null);
-  const [selectImageFile, setSelectImageFile] = useState<File | null>(null);
+  const [focusPoint, setFocusPoint] = useState<{ x: number; y: number }>(() => {
+    if (typeof window === "undefined") return [];
+
+    const getFocusPoint = localStorage.getItem("focus");
+    if (!getFocusPoint)
+      return {
+        x: 50,
+        y: 50,
+      };
+    try {
+      return JSON.parse(getFocusPoint);
+    } catch {
+      return {
+        x: 50,
+        y: 50,
+      };
+    }
+  });
+
+  const [selectImageFile, setSelectImageFile] = useState<Saved>({
+    image: null,
+    X: focusPoint.x,
+    Y: focusPoint.y,
+  });
+
+  const openDb = (): Promise<IDBDatabase> => {
+    return new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("eventImage", 1);
+
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains("pictures")) {
+          db.createObjectStore("pictures", {
+            keyPath: "id",
+            autoIncrement: true,
+          });
+        }
+      };
+
+      request.onsuccess = () => resolve(request.result);
+
+      request.onerror = () => reject(request.error);
+    });
+  };
+
+  const handleImageSetter = async (imageRecord: Saved) => {
+    const db = await openDb();
+    try {
+      const tx = db.transaction("pictures", "readwrite");
+      const store = tx.objectStore("pictures");
+      const imageArrayStore: Saved[] = [];
+      imageArrayStore.push(imageRecord);
+      imageArrayStore.forEach((image) => store.put(image));
+
+      await new Promise((res, rej) => {
+        tx.oncomplete = () => res(null);
+        tx.onerror = () => rej(tx.error);
+        tx.onabort = () => rej(tx.error);
+      });
+    } finally {
+      db.close();
+    }
+  };
+
   const [eachUserEventCreationList, setEachUserEventCreationList] = useState<
     Event[]
   >([]);
 
-  const supabase= createClient()
+  const supabase = createClient();
   const dateOnSelect = (date: Date) => {
     setDate(date);
     setOpen(false);
@@ -62,7 +127,7 @@ export function useEventCreation() {
       !eventDetailCreation.eventTitle.trim() ||
       !eventDetailCreation.eventSummary.trim() ||
       !eventDetailCreation.eventCategory.trim() ||
-      !selectImageFile?.name ||
+      !selectImageFile?.image?.name ||
       !eventDetailCreation.eventOverview.trim() ||
       !eventDetailCreation.eventStartTime.trim() ||
       !eventDetailCreation.eventLocationsCreate.trim() ||
@@ -99,18 +164,81 @@ export function useEventCreation() {
     setEventDetailCreation((prev) => ({ ...prev, eventCategory: value }));
   };
 
+  const [isPopUp, setIsPopUp] = useState<boolean>(false);
+
   const handleImageOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const file = e.target.files[0];
-    setSelectImageFile(file);
-    const previewUrl = URL.createObjectURL(file);
-    setPreviewImage(previewUrl);
+    setIsPopUp(true);
+    const saveFirstForPop = file;
+    setSelectImageFile((prev) => ({ ...prev, image: saveFirstForPop }));
+  };
+  console.log("Image", selectImageFile.image);
+
+  const focusRef = useRef<HTMLDivElement | null>(null);
+  const imageRefs = useRef<HTMLImageElement | null>(null);
+
+  const handleMouseDown = () => {
+    let x: number;
+    let y: number;
+    const handleMove = (e: MouseEvent) => {
+      const rect = imageRefs.current!.getBoundingClientRect();
+      x = ((e.clientX - rect.left) / rect.width) * 100;
+      y = ((e.clientY - rect.top) / rect.height) * 100;
+      setFocusPoint({
+        x: Math.max(0, Math.min(100, x)),
+        y: Math.max(0, Math.min(100, y)),
+      });
+    };
+
+    const handleUp = () => {
+      document.removeEventListener("mousemove", handleMove);
+      document.removeEventListener("mouseup", handleUp);
+    };
+
+    document.addEventListener("mousemove", handleMove);
+    document.addEventListener("mouseup", () => {
+      setSelectImageFile((prev) => ({ ...prev, X: x, Y: y }));
+      handleUp();
+    });
+  };
+  const [imageSetter, setImageStter] = useState<(Saved & { id: number })[]>([]);
+
+  const handleSaveImage = async () => {
+    if (!selectImageFile) return;
+    await handleImageSetter({
+      image: selectImageFile.image,
+      X: focusPoint.x,
+      Y: focusPoint.y,
+    });
+    const savedImages = await getAllImageRecords();
+    setImageStter(savedImages);
+    setIsPopUp(false);
   };
 
+  const handleCancel = () => {
+    setIsPopUp(false);
+    setSelectImageFile({
+      image: null,
+      X: null,
+      Y: null,
+    });
+  };
+
+  const getAllImageRecords = async (): Promise<(Saved & { id: number })[]> => {
+    const db = await openDb();
+    const req = db.transaction("pictures").objectStore("pictures").getAll();
+    const result = await new Promise<any[]>((res, rej) => {
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error);
+    });
+    db.close();
+    return result;
+  };
   const handleEventDetailCreationSubmission = async () => {
     if (!handleEventCreationValidation()) return;
 
-    if (!selectImageFile) {
+    if (!selectImageFile.image) {
       toast.error("No file selected");
       return;
     }
@@ -144,12 +272,12 @@ export function useEventCreation() {
         console.log("User is an attendee, cannot create events");
         return;
       } else {
-        const filePath = `eventcreationImageFolder/${Date.now()}_${selectImageFile.name}`;
+        const filePath = `eventcreationImageFolder/${Date.now()}_${selectImageFile.image.name}`;
 
         const { data: uploadData, error: uploadError } = await supabase.storage
           // .from("eventimages")
           .from("eventImage")
-          .upload(filePath, selectImageFile, { upsert: true });
+          .upload(filePath, selectImageFile.image, { upsert: true });
 
         console.log("DATA1", uploadData);
         if (!uploadData || uploadError) {
@@ -337,5 +465,15 @@ export function useEventCreation() {
     setDateSetter,
     handleUserEventList,
     allListUserEventValue,
+    isPopUp,
+    focusPoint,
+    imageRefs,
+    focusRef,
+    handleMouseDown,
+    selectImageFile,
+    handleCancel,
+    handleSaveImage,
+    getAllImageRecords,
+    imageSetter
   };
 }

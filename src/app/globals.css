@@ -182,3 +182,13 @@ input[type="number"] {
     @apply bg-background text-foreground;
   }
 }
+
+.main-image {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none;     /* IE 10 and Edge */
+  user-select: none;         /* Standard syntax */
+  
+  /* Prevents the browser's native ghost ghost image from appearing */
+  -webkit-user-drag: none;
+  user-drag: none; 
+}

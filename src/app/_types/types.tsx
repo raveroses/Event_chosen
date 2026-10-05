@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, KeyboardEvent, ReactNode } from "react";
+import { ChangeEvent, FormEvent, KeyboardEvent, ReactNode, RefObject } from "react";
 
 export type Event = {
   eventCategory: string;
@@ -81,8 +81,23 @@ export type Context = {
   handleSignUpNewUserOnchange: (e: ChangeEvent<HTMLInputElement>) => void;
   loginDetail: LoginDetail;
   handleLoginOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
+  isPopUp: boolean;
+  focusPoint: { x: number, y: number },
+  imageRefs: RefObject<HTMLImageElement | null>,
+  focusRef: RefObject<HTMLDivElement | null>
+  selectImageFile: Saved;
+  handleMouseDown: () => void;
+  handleCancel: () => void;
+  handleSaveImage: () => void;
+  getAllImageRecords: () => Promise<(Saved & { id: number })[]>
+  imageSetter: (Saved & { id: number })[]
 
+};
+export type Saved = {
+  image: File | null;
+  X: number | null;
+  Y: number | null;
+};
 export type Location = {
   [key: string]: ReactNode | string;
 };
@@ -127,47 +142,3 @@ export type CreateList = {
   icon: ReactNode;
   list: string;
 };
-
-// export type EventDetail = {
-//   eventTitle: string;
-//   eventSummary: string;
-//   eventStatus: string;
-//   eventLocationsCreate: string;
-//   eventOverview: string;
-// };
-
-// useEffect(() => {
-//   const becomingOrganizerChecker = async () => {
-//     try {
-//       const {
-//         data: { session },
-//         error: userSessionError,
-//       } = await supabase.auth.getSession();
-
-//       const { data: userTableFetching, error: userTableFetchingError } =
-//         await supabase
-//           .from("users")
-//           .select("roles")
-//           .eq("id", session?.user.id)
-//           .single();
-
-//       if (userTableFetchingError) {
-//         console.log("Error fetching user:", userTableFetchingError);
-//       }
-//       if (userSessionError || !session?.user) {
-//         console.log("No active session:", userSessionError);
-//         return;
-//       }
-
-//       if (userTableFetching?.roles === "attendee" && session.user.email) {
-//         setDisplayBecomeAuser(true);
-//       }
-//     } catch (e: unknown) {
-//       if (e instanceof Error) {
-//         console.log(e.message);
-//       }
-//     }
-//   };
-
-//   becomingOrganizerChecker();
-// }, [displayBecomeAuser]);

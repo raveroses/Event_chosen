@@ -24,6 +24,7 @@ export default function DashboardLayout({
         </div>
         {children}
       </div>
+      
       <OverlayBackground />
     </div>
   );
