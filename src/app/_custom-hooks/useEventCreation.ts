@@ -72,12 +72,12 @@ export function useEventCreation() {
   const handleImageSetter = async (imageRecord: Saved) => {
     const db = await openDb();
     try {
-      const tx = db.transaction("pictures", "readwrite");
+      const tx = db.transaction(["pictures"], "readwrite");
       const store = tx.objectStore("pictures");
-      const imageArrayStore: Saved[] = [];
-      imageArrayStore.push(imageRecord);
-      imageArrayStore.forEach((image) => store.put(image));
-
+      // const imageArrayStore: Saved[] = [];
+      // imageArrayStore.push(imageRecord);
+      // imageArrayStore.forEach((image) => store.put(image));
+      store.put(imageRecord);
       await new Promise((res, rej) => {
         tx.oncomplete = () => res(null);
         tx.onerror = () => rej(tx.error);
@@ -202,28 +202,9 @@ export function useEventCreation() {
       handleUp();
     });
   };
-  const [imageSetter, setImageStter] = useState<(Saved & { id: number })[]>([]);
-
-  const handleSaveImage = async () => {
-    if (!selectImageFile) return;
-    await handleImageSetter({
-      image: selectImageFile.image,
-      X: focusPoint.x,
-      Y: focusPoint.y,
-    });
-    const savedImages = await getAllImageRecords();
-    setImageStter(savedImages);
-    setIsPopUp(false);
-  };
-
-  const handleCancel = () => {
-    setIsPopUp(false);
-    setSelectImageFile({
-      image: null,
-      X: null,
-      Y: null,
-    });
-  };
+  const [imageSetter, setImageSetter] = useState<(Saved & { id: number })[]>(
+    [],
+  );
 
   const getAllImageRecords = async (): Promise<(Saved & { id: number })[]> => {
     const db = await openDb();
@@ -235,6 +216,39 @@ export function useEventCreation() {
     db.close();
     return result;
   };
+
+  useEffect(() => {
+    const loadInitialImages = async () => {
+      const savedImages = await getAllImageRecords();
+      setImageSetter(savedImages);
+    };
+
+    loadInitialImages();
+  }, []);
+
+  const handleSaveImage = async () => {
+    if (!selectImageFile) return;
+    await handleImageSetter({
+      image: selectImageFile.image,
+      X: focusPoint.x,
+      Y: focusPoint.y,
+    });
+    const savedImages = await getAllImageRecords();
+    setImageSetter(savedImages);
+    setIsPopUp(false);
+  };
+
+  console.log("image setting ", imageSetter);
+
+  const handleCancel = () => {
+    setIsPopUp(false);
+    setSelectImageFile({
+      image: null,
+      X: null,
+      Y: null,
+    });
+  };
+
   const handleEventDetailCreationSubmission = async () => {
     if (!handleEventCreationValidation()) return;
 
@@ -474,6 +488,6 @@ export function useEventCreation() {
     handleCancel,
     handleSaveImage,
     getAllImageRecords,
-    imageSetter
+    imageSetter,
   };
 }

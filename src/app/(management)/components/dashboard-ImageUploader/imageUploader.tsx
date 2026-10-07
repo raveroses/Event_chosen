@@ -18,57 +18,70 @@ const ImageUploader = () => {
     imageRef,
     selectImageFile,
     getAllImageRecords,
+    previewImage,
     imageSetter
   } = useAppContext();
-  const backgroundImages: string[] = ["/yoga.jpeg", "/set.jpeg", "/herosec.jpeg"];
-  const [currentImage, setCurrentImage] = useState<string>(backgroundImages[0]);
+
+  const fallbackImages = ["/yoga.jpeg", "/set.jpeg", "/herosec.jpeg"];
+
+  const [currentImage, setCurrentImage] = useState<File | string | null>(
+    imageSetter.length > 0 ? imageSetter[0]?.image ?? null : fallbackImages[0],
+  );
+
+  console.log("Length checker", imageSetter.length);
+
+  const isImageFetchAvailable = imageSetter.length > 0
+
   const imageCount = useRef<number>(0);
   useEffect(() => {
-    let intervalId;
+
+    if (imageSetter.length > 0 && !currentImage) {
+      setCurrentImage(imageSetter[0]?.image);
+    } else if (!currentImage) {
+      setCurrentImage(fallbackImages[0]);
+    }
 
     const handleImageSwipping = () => {
-      if (imageCount.current < backgroundImages.length - 1) {
+      const activeList = isImageFetchAvailable ? imageSetter.map(i => i.image) : fallbackImages;
 
+      if (imageCount.current < activeList.length - 1) {
         const next = imageCount.current + 1;
-        imageCount.current = next
-        setCurrentImage(backgroundImages[next]);
-        console.log("image-count", imageCount.current);
-
+        imageCount.current = next;
+        setCurrentImage(activeList[next]);
       } else {
-        imageCount.current = 0
-        setCurrentImage(backgroundImages[0]);
+        imageCount.current = 0;
+        setCurrentImage(activeList[0]);
       }
     };
-    intervalId = setInterval(handleImageSwipping, 5000);
 
+    const intervalId = setInterval(handleImageSwipping, 5000);
 
     return () => {
-      console.log("Im cleaned up")
-      clearInterval(intervalId)
+      clearInterval(intervalId);
+    };
+  }, [imageSetter]);
 
+
+  const getBackgroundImageUrl = () => {
+    if (previewImage) return previewImage;
+    if (!currentImage) return '';
+
+    if (currentImage instanceof File) {
+      return URL.createObjectURL(currentImage);
     }
-  }, [])
-  console.log("image-count2", imageCount.current);
 
-  console.log("IMAGE", currentImage);
-  // const imageViewing = Array.isArray(multipleImageSetter)
-  //   ? multipleImageSetter.map((previewImage, index) => {
-  //     const preview = URL.createObjectURL(previewImage)
-  //     return <div key={index}>
-  //       <Image src={preview} alt="image" width={200} height={400} />
-  //     </div>
-  //   })
-  //   : [];
-
+    // If it's already a string path (from database or fallback)
+    return currentImage.startsWith('/') ? currentImage : `/images/${currentImage}`;
+  };
 
 
 
   return (
     <section className="md:w-[800px] w-full min-width-full md:overflow-y-scroll overflow-none flex flex-col gap-[10px] md:gap-[100px] relativ ">
-      {/* <div
+      <div
         className={`relative background w-full md:h-[400px] h-[300px] min-w-full md:rounded-2xl`}
         style={{
-          backgroundImage: `url(${previewImage || `/images${currentImage}`})`,
+          backgroundImage: `url(${getBackgroundImageUrl()})`,
         }}
       >
         <div className="absolute top-[10px] md:left-[740px] left-[90%] bg-white text-[#3659e3] rounded-full text-center p-[8px] font-bold z-30" >
@@ -97,7 +110,7 @@ const ImageUploader = () => {
         </div>
 
         <div className="pagination absolute bottom-5 flex gap-3 px-5">
-          {Array(3).fill(null).map((_, index: number) => {
+          {Array(isImageFetchAvailable ? imageSetter.length : fallbackImages.length).fill(null).map((_, index: number) => {
             const isNumberAlignWithCurrentImage = index === imageCount.current
             return (
               <div className={`${isNumberAlignWithCurrentImage ? "bg-white" : "opacity-50"}  border-3  w-[240px]`} key={index}></div>
@@ -105,7 +118,7 @@ const ImageUploader = () => {
             )
           })}
         </div>
-      </div> */}
+      </div>
       <div className="border border-gray-300 px-6 py-10">
         <h1 className="text-2xl font-extrabold">
           Add images and video
@@ -161,26 +174,25 @@ const ImageUploader = () => {
           </div>
         </div>
 
-        <div className="savedImages flex items-center gap-3 py-5">
+        {imageSetter.length > 0 && <div className="savedImages flex items-center gap-3 py-5">
           <div className="bg-[#dbdae3] w-[120px] h-[60px] flex justify-center items-center text-[20px] font-semibold text-[#3659e3] rounded-md">
             <FaPlus />
           </div>
 
           {imageSetter.map((image_detail, index) => {
-            let url = ""
-            if (image_detail.image) {
-              url = URL.createObjectURL(image_detail.image); // inside the if, TypeScript knows file is a File
-            }
+            let url = "";
+            if (!image_detail.image) return null
+            url = URL.createObjectURL(image_detail.image);
+
 
             return (<div key={index}>
-
               <Image src={url} alt="image" width={120} height={60} className="w-[120px] h-[60px] rounded-md object-center object-cover " />
             </div>)
           })}
 
-        </div>
+        </div>}
       </div>
-      {/* <div className="flex flex-col gap-[20px]">
+      <div className="flex flex-col gap-[20px]">
         <EventTitle />
         <Date />
         <Overview />
@@ -192,7 +204,7 @@ const ImageUploader = () => {
             Publish
           </button>
         </div>
-      </div> */}
+      </div>
 
 
 
